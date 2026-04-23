@@ -1,0 +1,25 @@
+{
+  "name": "aprendendo-com-thomas",
+  "version": "2.0.0",
+  "description": "App educacional interativo para o Thomas aprender a ler e escrever",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "npx serve public -l 3456",
+    "test": "npx vitest run",
+    "test:watch": "npx vitest",
+    "test:e2e": "npx playwright test"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.0",
+    "jsdom": "^24.0.0",
+    "@playwright/test": "^1.44.0",
+    "serve": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

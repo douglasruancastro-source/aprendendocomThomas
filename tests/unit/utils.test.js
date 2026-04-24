@@ -1,32 +1,21 @@
 import { describe, it, expect } from 'vitest';
-
-// We test the pure logic functions that exist in the app
-// Since the app is a single HTML file, we recreate the testable functions here
-
-function shuffle(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-}
-
-function wait(ms) {
-    return new Promise(r => setTimeout(r, ms));
-}
+import {
+    shuffle,
+    wait,
+    randInt,
+    sampleN,
+    sampleWithoutRepeats,
+    todayStr,
+    daysBetween,
+} from '../../public/js/utils.js';
 
 describe('shuffle', () => {
     it('returns an array with the same length', () => {
-        const input = [1, 2, 3, 4, 5];
-        const result = shuffle(input);
-        expect(result).toHaveLength(input.length);
+        expect(shuffle([1, 2, 3, 4, 5])).toHaveLength(5);
     });
 
     it('contains all original elements', () => {
-        const input = ['A', 'B', 'C', 'D', 'E'];
-        const result = shuffle(input);
-        expect(result.sort()).toEqual(input.sort());
+        expect(shuffle(['A', 'B', 'C']).sort()).toEqual(['A', 'B', 'C']);
     });
 
     it('does not mutate the original array', () => {
@@ -46,12 +35,11 @@ describe('shuffle', () => {
 
     it('returns a different order at least sometimes (statistical)', () => {
         const input = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        let differentOrderCount = 0;
+        let diff = 0;
         for (let i = 0; i < 10; i++) {
-            const result = shuffle(input);
-            if (result.join(',') !== input.join(',')) differentOrderCount++;
+            if (shuffle(input).join(',') !== input.join(',')) diff++;
         }
-        expect(differentOrderCount).toBeGreaterThan(0);
+        expect(diff).toBeGreaterThan(0);
     });
 });
 
@@ -59,12 +47,63 @@ describe('wait', () => {
     it('resolves after the specified delay', async () => {
         const start = Date.now();
         await wait(50);
-        const elapsed = Date.now() - start;
-        expect(elapsed).toBeGreaterThanOrEqual(40); // Allow small tolerance
+        expect(Date.now() - start).toBeGreaterThanOrEqual(40);
     });
 
     it('returns a promise', () => {
-        const result = wait(1);
-        expect(result).toBeInstanceOf(Promise);
+        expect(wait(1)).toBeInstanceOf(Promise);
+    });
+});
+
+describe('randInt', () => {
+    it('returns integer within [min, max] inclusive', () => {
+        for (let i = 0; i < 50; i++) {
+            const n = randInt(3, 7);
+            expect(Number.isInteger(n)).toBe(true);
+            expect(n).toBeGreaterThanOrEqual(3);
+            expect(n).toBeLessThanOrEqual(7);
+        }
+    });
+});
+
+describe('sampleN', () => {
+    it('returns n items when n <= pool size', () => {
+        expect(sampleN([1, 2, 3, 4, 5], 3)).toHaveLength(3);
+    });
+
+    it('caps at pool size when n > pool size', () => {
+        expect(sampleN([1, 2], 5)).toHaveLength(2);
+    });
+});
+
+describe('sampleWithoutRepeats', () => {
+    it('prefers fresh items over recent ones', () => {
+        const pool = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }];
+        const recent = ['a', 'b'];
+        // com pool=4, recent=2, n=2 → deve trazer só c,d
+        for (let i = 0; i < 20; i++) {
+            const picked = sampleWithoutRepeats(pool, 2, recent, (x) => x.id);
+            const ids = picked.map((x) => x.id).sort();
+            expect(ids).toEqual(['c', 'd']);
+        }
+    });
+
+    it('falls back to recent when fresh pool is too small', () => {
+        const pool = [{ id: 'a' }, { id: 'b' }];
+        const recent = ['a', 'b'];
+        const picked = sampleWithoutRepeats(pool, 2, recent, (x) => x.id);
+        expect(picked).toHaveLength(2);
+    });
+});
+
+describe('todayStr / daysBetween', () => {
+    it('todayStr formats YYYY-MM-DD', () => {
+        const s = todayStr(new Date(2026, 3, 5));
+        expect(s).toBe('2026-04-05');
+    });
+
+    it('daysBetween counts whole days', () => {
+        expect(daysBetween('2026-04-01', '2026-04-05')).toBe(4);
+        expect(daysBetween('2026-04-05', '2026-04-05')).toBe(0);
     });
 });

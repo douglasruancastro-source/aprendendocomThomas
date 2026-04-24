@@ -1,278 +1,236 @@
 import { describe, it, expect } from 'vitest';
+import { VOWELS, CONSONANTS, VOWELS_ACCENT, generateFindLettersRounds } from '../../public/js/data/letters.js';
+import { SYLLABLE_ROUNDS } from '../../public/js/data/syllables.js';
+import { BUILD_WORD_ROUNDS, READ_MATCH_ROUNDS, FILL_BLANK_ROUNDS, TYPE_WORD_ROUNDS } from '../../public/js/data/words.js';
+import { SEQUENCE_ROUNDS, MEMORY_ROUNDS, ODD_ONE_OUT_ROUNDS, COUNT_MATCH_ROUNDS } from '../../public/js/data/logic.js';
+import { PHASES, phaseById, ROUNDS_PER_PHASE } from '../../public/js/data/phases.js';
+import { COLOR_ROUNDS } from '../../public/js/data/colors.js';
+import { NUMBER_ROUNDS } from '../../public/js/data/numbers.js';
+import { ADD_ROUNDS, SUB_ROUNDS } from '../../public/js/data/math.js';
 
-// Recreate data structures from the app for testing
+describe('generateFindLettersRounds (vowels, level 1)', () => {
+    const rounds = generateFindLettersRounds(true, 6, 1);
 
-const VOWELS = ['A','E','I','O','U'];
-const CONSONANTS = ['B','C','D','F','G','H','J','K','L','M','N','P','Q','R','S','T','V','X','Z'];
+    it('generates 6 rounds', () => expect(rounds).toHaveLength(6));
 
-function shuffle(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-}
-
-function generateFindLettersRounds(findVowels) {
-    const rounds = [];
-    for (let i = 0; i < 6; i++) {
-        const letters = [];
-        const numTarget = 3 + Math.floor(Math.random() * 2);
-        const targets = findVowels ? VOWELS : CONSONANTS;
-        const others = findVowels ? CONSONANTS : VOWELS;
-        const chosen = shuffle([...targets]).slice(0, numTarget);
-        chosen.forEach(l => letters.push(l));
-        shuffle([...others]).slice(0, Math.min(5, others.length)).forEach(o => letters.push(o));
-        rounds.push({ letters: shuffle(letters), correct: chosen });
-    }
-    return rounds;
-}
-
-const SYLLABLE_ROUNDS = [
-    { syllable: 'BA', options: ['BA', 'DA', 'PA'] },
-    { syllable: 'BI', options: ['BI', 'DI', 'PI'] },
-    { syllable: 'CA', options: ['CA', 'GA', 'TA'] },
-    { syllable: 'DO', options: ['DO', 'BO', 'GO'] },
-    { syllable: 'FE', options: ['FE', 'VE', 'LE'] },
-    { syllable: 'MA', options: ['MA', 'NA', 'LA'] },
-    { syllable: 'LU', options: ['LU', 'RU', 'NU'] },
-    { syllable: 'SO', options: ['SO', 'TO', 'PO'] }
-];
-
-const BUILD_WORD_ROUNDS = [
-    { word: 'BOLA', image: 'bola' }, { word: 'CASA', image: 'casa' },
-    { word: 'GATO', image: 'gato' }, { word: 'PATO', image: 'pato' },
-    { word: 'SAPO', image: 'sapo' }, { word: 'LUA', image: 'lua' },
-    { word: 'SOL', image: 'sol' }, { word: 'MESA', image: 'mesa' }
-];
-
-const READ_MATCH_ROUNDS = [
-    { word: 'GATO', correct: 'gato', options: ['gato', 'pato', 'casa', 'bola'] },
-    { word: 'CASA', correct: 'casa', options: ['sol', 'casa', 'flor', 'gato'] },
-    { word: 'SOL', correct: 'sol', options: ['lua', 'bola', 'sol', 'peixe'] },
-    { word: 'BOLA', correct: 'bola', options: ['bola', 'ovo', 'sol', 'mesa'] },
-];
-
-const FILL_BLANK_ROUNDS = [
-    { word: 'GATO', blank: 0, display: '_ATO', options: ['G', 'P', 'M'] },
-    { word: 'BOLA', blank: 0, display: '_OLA', options: ['B', 'C', 'S'] },
-    { word: 'CASA', blank: 2, display: 'CA_A', options: ['S', 'R', 'L'] },
-];
-
-const SEQUENCE_ROUNDS = [
-    { sequence: ['A','B','A','B'], answer: 'A', options: ['A','C','B'], type: 'letter' },
-    { sequence: ['1','2','3','4'], answer: '5', options: ['5','7','3'], type: 'number' },
-    { sequence: ['circle','square','circle','square'], answer: 'circle', options: ['circle','triangle','square'], type: 'shape' },
-];
-
-const ODD_ONE_OUT_ROUNDS = [
-    { items: ['gato','pato','sapo','casa'], labels: ['Gato','Pato','Sapo','Casa'], oddIdx: 3, category: 'animais' },
-    { items: ['sol','lua','estrela','mesa'], labels: ['Sol','Lua','Estrela','Mesa'], oddIdx: 3, category: 'ceu' },
-];
-
-const COUNT_MATCH_ROUNDS = [
-    { image: 'estrela', count: 3, options: ['1','2','3'], word: 'TRES' },
-    { image: 'bola', count: 2, options: ['2','4','5'], word: 'DOIS' },
-    { image: 'flor', count: 5, options: ['3','5','4'], word: 'CINCO' },
-];
-
-const MEMORY_ROUNDS = [
-    { pairs: [{ word: 'GATO', image: 'gato' }, { word: 'BOLA', image: 'bola' }, { word: 'SOL', image: 'sol' }, { word: 'LUA', image: 'lua' }] },
-];
-
-describe('generateFindLettersRounds (vowels)', () => {
-    const rounds = generateFindLettersRounds(true);
-
-    it('generates 6 rounds', () => {
-        expect(rounds).toHaveLength(6);
-    });
-
-    it('each round has letters array and correct array', () => {
-        rounds.forEach(round => {
-            expect(round).toHaveProperty('letters');
-            expect(round).toHaveProperty('correct');
-            expect(Array.isArray(round.letters)).toBe(true);
-            expect(Array.isArray(round.correct)).toBe(true);
+    it('each round has id, letters and correct arrays', () => {
+        rounds.forEach((r) => {
+            expect(r.id).toBeTruthy();
+            expect(Array.isArray(r.letters)).toBe(true);
+            expect(Array.isArray(r.correct)).toBe(true);
         });
     });
 
-    it('correct letters are all vowels', () => {
-        rounds.forEach(round => {
-            round.correct.forEach(letter => {
-                expect(VOWELS).toContain(letter);
-            });
-        });
+    it('correct letters are all vowels (no accents at level 1)', () => {
+        rounds.forEach((r) => r.correct.forEach((l) => expect(VOWELS).toContain(l)));
     });
 
     it('each round has 3-4 target vowels', () => {
-        rounds.forEach(round => {
-            expect(round.correct.length).toBeGreaterThanOrEqual(3);
-            expect(round.correct.length).toBeLessThanOrEqual(4);
+        rounds.forEach((r) => {
+            expect(r.correct.length).toBeGreaterThanOrEqual(3);
+            expect(r.correct.length).toBeLessThanOrEqual(4);
         });
     });
 
     it('letters array contains all correct letters', () => {
-        rounds.forEach(round => {
-            round.correct.forEach(c => {
-                expect(round.letters).toContain(c);
-            });
-        });
+        rounds.forEach((r) => r.correct.forEach((c) => expect(r.letters).toContain(c)));
+    });
+});
+
+describe('generateFindLettersRounds (vowels, level 2)', () => {
+    it('may include accented vowels at level 2', () => {
+        // Determinístico: basta que o pool seja o aumentado — não garantimos que sorteia acentuada.
+        const rounds = generateFindLettersRounds(true, 50, 2);
+        const allPicked = rounds.flatMap((r) => r.correct);
+        // Pool inclui acentuadas; para 50 rodadas*3-4 picks, é extremamente improvável não ter nenhuma.
+        expect(allPicked.some((l) => VOWELS_ACCENT.includes(l))).toBe(true);
     });
 });
 
 describe('generateFindLettersRounds (consonants)', () => {
-    const rounds = generateFindLettersRounds(false);
-
     it('correct letters are all consonants', () => {
-        rounds.forEach(round => {
-            round.correct.forEach(letter => {
-                expect(CONSONANTS).toContain(letter);
-            });
-        });
+        const rounds = generateFindLettersRounds(false, 6, 1);
+        rounds.forEach((r) => r.correct.forEach((l) => expect(CONSONANTS).toContain(l)));
     });
 });
 
 describe('SYLLABLE_ROUNDS', () => {
-    it('each round has correct syllable in options', () => {
-        SYLLABLE_ROUNDS.forEach(round => {
-            expect(round.options).toContain(round.syllable);
+    it('has at least 24 rounds (target expansion)', () => {
+        expect(SYLLABLE_ROUNDS.length).toBeGreaterThanOrEqual(24);
+    });
+    it('each round has correct syllable in options and a level', () => {
+        SYLLABLE_ROUNDS.forEach((r) => {
+            expect(r.options).toContain(r.syllable);
+            expect([1, 2]).toContain(r.level);
         });
     });
-
-    it('each round has exactly 3 options', () => {
-        SYLLABLE_ROUNDS.forEach(round => {
-            expect(round.options).toHaveLength(3);
-        });
+    it('every round has a unique id', () => {
+        const ids = SYLLABLE_ROUNDS.map((r) => r.id);
+        expect(new Set(ids).size).toBe(ids.length);
     });
 });
 
 describe('BUILD_WORD_ROUNDS', () => {
-    it('each round has word and image', () => {
-        BUILD_WORD_ROUNDS.forEach(round => {
-            expect(round.word).toBeTruthy();
-            expect(round.image).toBeTruthy();
-        });
-    });
-
-    it('image key is lowercase version of word', () => {
-        BUILD_WORD_ROUNDS.forEach(round => {
-            expect(round.image).toBe(round.word.toLowerCase());
+    it('expanded to 24+ rounds', () => expect(BUILD_WORD_ROUNDS.length).toBeGreaterThanOrEqual(24));
+    it('image key is lowercase version of word (no acentos em imagem)', () => {
+        BUILD_WORD_ROUNDS.forEach((r) => {
+            expect(r.word).toBeTruthy();
+            expect(r.image).toBe(r.word.toLowerCase());
         });
     });
 });
 
 describe('READ_MATCH_ROUNDS', () => {
-    it('correct answer is in options', () => {
-        READ_MATCH_ROUNDS.forEach(round => {
-            expect(round.options).toContain(round.correct);
-        });
-    });
-
-    it('each round has 4 options', () => {
-        READ_MATCH_ROUNDS.forEach(round => {
-            expect(round.options).toHaveLength(4);
+    it('expanded to 20+ rounds', () => expect(READ_MATCH_ROUNDS.length).toBeGreaterThanOrEqual(20));
+    it('correct answer is in options and each round has 4 options', () => {
+        READ_MATCH_ROUNDS.forEach((r) => {
+            expect(r.options).toContain(r.correct);
+            expect(r.options).toHaveLength(4);
         });
     });
 });
 
 describe('FILL_BLANK_ROUNDS', () => {
-    it('correct letter is in options', () => {
-        FILL_BLANK_ROUNDS.forEach(round => {
-            const correctLetter = round.word[round.blank];
-            expect(round.options).toContain(correctLetter);
+    it('expanded to 20+ rounds', () => expect(FILL_BLANK_ROUNDS.length).toBeGreaterThanOrEqual(20));
+    it('correct letter is word[blank], within bounds, and display has underscore at blank', () => {
+        FILL_BLANK_ROUNDS.forEach((r) => {
+            expect(r.options).toContain(r.word[r.blank]);
+            expect(r.blank).toBeGreaterThanOrEqual(0);
+            expect(r.blank).toBeLessThan(r.word.length);
+            expect(r.display[r.blank]).toBe('_');
         });
     });
+});
 
-    it('blank index is within word bounds', () => {
-        FILL_BLANK_ROUNDS.forEach(round => {
-            expect(round.blank).toBeGreaterThanOrEqual(0);
-            expect(round.blank).toBeLessThan(round.word.length);
-        });
-    });
-
-    it('display has underscore at blank position', () => {
-        FILL_BLANK_ROUNDS.forEach(round => {
-            expect(round.display[round.blank]).toBe('_');
-        });
+describe('TYPE_WORD_ROUNDS', () => {
+    it('expanded to 20+ rounds', () => expect(TYPE_WORD_ROUNDS.length).toBeGreaterThanOrEqual(20));
+    it('each round has image key matching lowercase word', () => {
+        TYPE_WORD_ROUNDS.forEach((r) => expect(r.image).toBe(r.word.toLowerCase()));
     });
 });
 
 describe('SEQUENCE_ROUNDS', () => {
-    it('answer is in options', () => {
-        SEQUENCE_ROUNDS.forEach(round => {
-            expect(round.options).toContain(round.answer);
-        });
-    });
-
-    it('each round has a type', () => {
-        SEQUENCE_ROUNDS.forEach(round => {
-            expect(['letter', 'number', 'shape']).toContain(round.type);
-        });
-    });
-
-    it('each round has at least 3 options', () => {
-        SEQUENCE_ROUNDS.forEach(round => {
-            expect(round.options.length).toBeGreaterThanOrEqual(3);
-        });
-    });
-});
-
-describe('ODD_ONE_OUT_ROUNDS', () => {
-    it('oddIdx is within items bounds', () => {
-        ODD_ONE_OUT_ROUNDS.forEach(round => {
-            expect(round.oddIdx).toBeGreaterThanOrEqual(0);
-            expect(round.oddIdx).toBeLessThan(round.items.length);
-        });
-    });
-
-    it('items and labels have same length', () => {
-        ODD_ONE_OUT_ROUNDS.forEach(round => {
-            expect(round.items).toHaveLength(round.labels.length);
-        });
-    });
-
-    it('each round has exactly 4 items', () => {
-        ODD_ONE_OUT_ROUNDS.forEach(round => {
-            expect(round.items).toHaveLength(4);
-        });
-    });
-});
-
-describe('COUNT_MATCH_ROUNDS', () => {
-    it('correct count is in options', () => {
-        COUNT_MATCH_ROUNDS.forEach(round => {
-            expect(round.options).toContain(String(round.count));
-        });
-    });
-
-    it('count is positive', () => {
-        COUNT_MATCH_ROUNDS.forEach(round => {
-            expect(round.count).toBeGreaterThan(0);
-        });
-    });
-
-    it('has a number word', () => {
-        COUNT_MATCH_ROUNDS.forEach(round => {
-            expect(round.word).toBeTruthy();
-            expect(typeof round.word).toBe('string');
+    it('expanded to 15+ rounds', () => expect(SEQUENCE_ROUNDS.length).toBeGreaterThanOrEqual(15));
+    it('answer is in options, has valid type and >=3 options', () => {
+        SEQUENCE_ROUNDS.forEach((r) => {
+            expect(r.options).toContain(r.answer);
+            expect(['letter', 'number', 'shape']).toContain(r.type);
+            expect(r.options.length).toBeGreaterThanOrEqual(3);
         });
     });
 });
 
 describe('MEMORY_ROUNDS', () => {
-    it('each round has 4 pairs', () => {
-        MEMORY_ROUNDS.forEach(round => {
-            expect(round.pairs).toHaveLength(4);
-        });
-    });
-
-    it('each pair has word and image', () => {
-        MEMORY_ROUNDS.forEach(round => {
-            round.pairs.forEach(pair => {
-                expect(pair.word).toBeTruthy();
-                expect(pair.image).toBeTruthy();
+    it('has at least 5 rounds and each pair has word + image', () => {
+        expect(MEMORY_ROUNDS.length).toBeGreaterThanOrEqual(5);
+        MEMORY_ROUNDS.forEach((r) => {
+            r.pairs.forEach((p) => {
+                expect(p.word).toBeTruthy();
+                expect(p.image).toBeTruthy();
             });
         });
+    });
+    it('level 2 has 6 pairs, level 1 has 4 pairs', () => {
+        MEMORY_ROUNDS.forEach((r) => {
+            if (r.level === 1) expect(r.pairs).toHaveLength(4);
+            if (r.level === 2) expect(r.pairs).toHaveLength(6);
+        });
+    });
+});
+
+describe('ODD_ONE_OUT_ROUNDS', () => {
+    it('expanded to 15+ rounds, each has exactly 4 items/labels and oddIdx in bounds', () => {
+        expect(ODD_ONE_OUT_ROUNDS.length).toBeGreaterThanOrEqual(15);
+        ODD_ONE_OUT_ROUNDS.forEach((r) => {
+            expect(r.items).toHaveLength(4);
+            expect(r.labels).toHaveLength(4);
+            expect(r.oddIdx).toBeGreaterThanOrEqual(0);
+            expect(r.oddIdx).toBeLessThan(r.items.length);
+        });
+    });
+});
+
+describe('COUNT_MATCH_ROUNDS', () => {
+    it('expanded to 15+ rounds, count is in options (as string), count positive', () => {
+        expect(COUNT_MATCH_ROUNDS.length).toBeGreaterThanOrEqual(15);
+        COUNT_MATCH_ROUNDS.forEach((r) => {
+            expect(r.options).toContain(String(r.count));
+            expect(r.count).toBeGreaterThan(0);
+            expect(r.word).toBeTruthy();
+        });
+    });
+});
+
+describe('PHASES / phaseById', () => {
+    it('has 16 phases with unique ids 1..16', () => {
+        expect(PHASES).toHaveLength(16);
+        expect(PHASES.map((p) => p.id).sort((a, b) => a - b)).toEqual([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]);
+    });
+    it('phaseById returns the matching phase', () => {
+        expect(phaseById(3).id).toBe(3);
+        expect(phaseById(13).type).toBe('color-match');
+        expect(phaseById(15).type).toBe('math-add');
+        expect(phaseById(999)).toBeUndefined();
+    });
+    it('every phase has a ROUNDS_PER_PHASE entry', () => {
+        PHASES.forEach((p) => expect(ROUNDS_PER_PHASE[p.id]).toBeGreaterThan(0));
+    });
+});
+
+describe('COLOR_ROUNDS (fase 13)', () => {
+    it('has rounds for both levels', () => {
+        expect(COLOR_ROUNDS.some((r) => r.level === 1)).toBe(true);
+        expect(COLOR_ROUNDS.some((r) => r.level === 2)).toBe(true);
+    });
+    it('each round has options containing the correct hex', () => {
+        COLOR_ROUNDS.forEach((r) => {
+            expect(r.options.map((o) => o.hex)).toContain(r.correctHex);
+            expect(r.options).toHaveLength(4);
+        });
+    });
+    it('every round has unique id', () => {
+        const ids = COLOR_ROUNDS.map((r) => r.id);
+        expect(new Set(ids).size).toBe(ids.length);
+    });
+});
+
+describe('NUMBER_ROUNDS (fase 14)', () => {
+    it('has rounds for both levels', () => {
+        expect(NUMBER_ROUNDS.some((r) => r.level === 1)).toBe(true);
+        expect(NUMBER_ROUNDS.some((r) => r.level === 2)).toBe(true);
+    });
+    it('each round counts include the correct number and has 4 options', () => {
+        NUMBER_ROUNDS.forEach((r) => {
+            expect(r.counts).toContain(r.correctCount);
+            expect(r.counts).toHaveLength(4);
+            expect(r.correctCount).toBe(r.number);
+        });
+    });
+});
+
+describe('ADD_ROUNDS (fase 15)', () => {
+    it('answer always equals a + b', () => {
+        ADD_ROUNDS.forEach((r) => expect(r.answer).toBe(r.a + r.b));
+    });
+    it('options contain the answer and are 4 unique values', () => {
+        ADD_ROUNDS.forEach((r) => {
+            expect(r.options).toContain(r.answer);
+            expect(new Set(r.options).size).toBe(r.options.length);
+        });
+    });
+    it('level 1 results stay under 6', () => {
+        ADD_ROUNDS.filter((r) => r.level === 1).forEach((r) => expect(r.answer).toBeLessThanOrEqual(5));
+    });
+});
+
+describe('SUB_ROUNDS (fase 16)', () => {
+    it('answer always equals a - b and is non-negative', () => {
+        SUB_ROUNDS.forEach((r) => {
+            expect(r.answer).toBe(r.a - r.b);
+            expect(r.answer).toBeGreaterThanOrEqual(0);
+        });
+    });
+    it('options contain the answer', () => {
+        SUB_ROUNDS.forEach((r) => expect(r.options).toContain(r.answer));
     });
 });

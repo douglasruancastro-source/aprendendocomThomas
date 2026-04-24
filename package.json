@@ -1,7 +1,7 @@
 {
-  "name": "aprendendo-com-thomas",
-  "version": "2.0.0",
-  "description": "App educacional interativo para o Thomas aprender a ler e escrever",
+  "name": "educatche",
+  "version": "3.0.0",
+  "description": "EducaTche - app educacional interativo gaucho para criancas aprenderem a ler e escrever",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

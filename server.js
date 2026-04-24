@@ -10,5 +10,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Aprendendo com Thomas rodando na porta ${PORT}`);
+  console.log(`EducaTche rodando na porta ${PORT}`);
 });

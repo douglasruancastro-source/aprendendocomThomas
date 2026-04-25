@@ -6,6 +6,12 @@
     <title>EducaTche</title>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/islands.css">
+    <link rel="preload" as="image" href="assets/maps/mapa-ilhas-home.jpg">
+    <link rel="preload" as="image" href="assets/brand/logo-mundo-tres-ilhas.jpg">
+    <link rel="preload" as="image" href="assets/mascots/tomi-capivara.jpg">
+    <link rel="preload" as="image" href="assets/mascots/ro-macaco.jpg">
+    <link rel="preload" as="image" href="assets/mascots/livi-arara.jpg">
     <script src="jspdf.umd.min.js"></script>
 </head>
 <body>
@@ -124,16 +130,42 @@
     </button>
 </div>
 
+<!-- ISLAND MAP SCREEN -->
+<div id="islandMap" class="screen">
+    <header class="map-header">
+        <img src="assets/brand/logo-mundo-tres-ilhas.jpg" alt="Mundo das Tres Ilhas" class="map-logo">
+    </header>
+    <div class="map-canvas">
+        <img src="assets/maps/mapa-ilhas-home.jpg" alt="" class="map-bg">
+        <button class="island-hotspot island-letters" data-section="letters" type="button" aria-label="Ilha das Letras com Tomi">
+            <img src="assets/mascots/tomi-capivara.jpg" alt="" class="island-mascot">
+            <span class="island-label">Letras</span>
+        </button>
+        <button class="island-hotspot island-numbers" data-section="numbers" type="button" aria-label="Ilha dos Numeros com Ro">
+            <img src="assets/mascots/ro-macaco.jpg" alt="" class="island-mascot">
+            <span class="island-label">Numeros</span>
+        </button>
+        <button class="island-hotspot island-colors" data-section="colors" type="button" aria-label="Ilha das Cores com Livi">
+            <img src="assets/mascots/livi-arara.jpg" alt="" class="island-mascot">
+            <span class="island-label">Cores</span>
+        </button>
+        <button class="island-hotspot island-rewards" data-section="rewards" type="button" aria-label="Ilha do Bau de Recompensas">
+            <span class="island-emoji" aria-hidden="true">&#x1F381;</span>
+            <span class="island-label">Recompensas</span>
+        </button>
+    </div>
+</div>
+
 <!-- MENU SCREEN -->
 <div id="menu" class="screen">
     <h2 id="menuTitle">Escolha uma fase!</h2>
     <div class="stars-bar" id="starsBar"></div>
     <button class="btn menu-shop-btn" id="shopBtn">&#x1F6D2; Loja</button>
-    <div class="section-label">Alfabetizacao</div>
+    <div class="section-label" data-section="alfa">Alfabetizacao</div>
     <div class="phases-grid" id="phasesGrid"></div>
-    <div class="section-label">Raciocinio Logico</div>
+    <div class="section-label" data-section="logic">Raciocinio Logico</div>
     <div class="phases-grid" id="phasesGridLogic"></div>
-    <div class="section-label">Matematica</div>
+    <div class="section-label" data-section="math">Matematica</div>
     <div class="phases-grid" id="phasesGridMath"></div>
     <div class="badges-section">
         <h3>Minhas Medalhas</h3>

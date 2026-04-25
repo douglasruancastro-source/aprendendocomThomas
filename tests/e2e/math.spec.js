@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-// Helper que entra no menu com progresso avancado ate antes da fase 13.
+// Helper que entra no menu de Matematica via ilha "Numeros" com progresso suficiente
+// para destravar a fase 13.
 async function startAtMath(page, name = 'Tche') {
     await page.goto('/');
     await page.evaluate(() => localStorage.clear());
@@ -15,12 +16,13 @@ async function startAtMath(page, name = 'Tche') {
         localStorage.setItem('thomas_learning_v3', JSON.stringify(s));
     });
     await page.reload();
-    // Pula splash novamente.
     await page.click('text=Bah, vamos comecar!');
+    // Clica na ilha de Numeros para chegar ao menu filtrado de Matematica.
+    await page.click('.island-numbers');
 }
 
 test.describe('Matematica (fases 13-16)', () => {
-    test('third section Matematica is visible with 4 cards', async ({ page }) => {
+    test('numeros island opens menu with 4 math cards', async ({ page }) => {
         await startAtMath(page);
         const mathGrid = page.locator('#phasesGridMath');
         await expect(mathGrid).toBeVisible();
@@ -45,6 +47,7 @@ test.describe('Matematica (fases 13-16)', () => {
         });
         await page.reload();
         await page.click('text=Bah, vamos comecar!');
+        await page.click('.island-numbers');
         const mathGrid = page.locator('#phasesGridMath');
         await mathGrid.locator('.phase-card').nth(2).click();
         await expect(page.locator('#activity')).toBeVisible();

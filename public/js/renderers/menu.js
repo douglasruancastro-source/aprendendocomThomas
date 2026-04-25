@@ -4,7 +4,7 @@ import { PHASES } from '../data/phases.js';
 import { BADGE_DEFS } from '../rewards.js';
 import { soundClick } from '../audio.js';
 
-export function renderMenu(state, onStartPhase, onOpenShop) {
+export function renderMenu(state, onStartPhase, onOpenShop, filter = 'all') {
     const grid = document.getElementById('phasesGrid');
     const gridLogic = document.getElementById('phasesGridLogic');
     const gridMath = document.getElementById('phasesGridMath');
@@ -12,6 +12,13 @@ export function renderMenu(state, onStartPhase, onOpenShop) {
     grid.innerHTML = '';
     gridLogic.innerHTML = '';
     if (gridMath) gridMath.innerHTML = '';
+
+    // Aplica classe de filtro no #menu para CSS esconder secoes nao pertinentes.
+    const menuRoot = document.getElementById('menu');
+    if (menuRoot) {
+        menuRoot.classList.remove('filter-letters', 'filter-numbers', 'filter-colors');
+        if (filter && filter !== 'all') menuRoot.classList.add(`filter-${filter}`);
+    }
 
     const starCount = state.completedPhases.length;
     starsBar.textContent = '\u2B50'.repeat(starCount) + '\u2606'.repeat(PHASES.length - starCount);
@@ -35,6 +42,7 @@ export function renderMenu(state, onStartPhase, onOpenShop) {
         card.className = 'phase-card' + (unlocked ? '' : ' locked');
         card.style.borderLeft = `5px solid ${phase.color}`;
         card.setAttribute('role', 'button');
+        card.setAttribute('data-phase-id', String(phase.id));
         card.setAttribute('aria-label', `Fase ${phase.id}: ${phase.subtitle}${unlocked ? '' : ' (bloqueada)'}`);
 
         const num = document.createElement('div');

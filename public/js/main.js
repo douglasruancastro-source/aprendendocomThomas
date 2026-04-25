@@ -5,6 +5,7 @@ import { applyTheme } from './shop.js';
 import { applyMascotLook, setMascot, hideMascot } from './renderers/mascot.js';
 import { renderMenu, renderHud, animateCoinGain } from './renderers/menu.js';
 import { renderShop } from './renderers/shop.js';
+import { renderIslandMap } from './renderers/islandMap.js';
 import { initEngine, startActivity, getCurrentPhase, triggerCelebration } from './engine.js';
 import { applyDailyBonus } from './rewards.js';
 import { downloadPrizePDF } from './pdf.js';
@@ -43,23 +44,32 @@ function showScreen(id) {
     if (target) target.classList.add('active');
 
     const homeBtn = document.getElementById('homeBtn');
-    if (homeBtn) homeBtn.style.display = (id === 'splash' || id === 'menu' || id === 'namePrompt') ? 'none' : 'block';
+    if (homeBtn) homeBtn.style.display = (id === 'splash' || id === 'menu' || id === 'namePrompt' || id === 'islandMap') ? 'none' : 'block';
 
     if (id === 'activity') setMascot('idle', state);
     else if (id === 'celebration') setMascot('celebrating', state);
     else hideMascot();
 }
 
-function showMenu() {
+function showMenu(filter = 'all') {
     applyPlayerNameToUI();
     showScreen('menu');
-    renderMenu(state, (phaseId) => startActivity(phaseId), showShop);
+    renderMenu(state, (phaseId) => startActivity(phaseId), showShop, filter);
+}
+
+function showIslandMap() {
+    applyPlayerNameToUI();
+    showScreen('islandMap');
+    renderIslandMap({
+        onPickSection: (section) => showMenu(section),
+        onOpenShop: showShop,
+    });
 }
 
 function showShop() {
     applyPlayerNameToUI();
     showScreen('shop');
-    renderShop(state, showMenu);
+    renderShop(state, showIslandMap);
 }
 
 function showCelebrationScreen(phase) {
@@ -97,10 +107,10 @@ function confirmName() {
 // ===== Wiring =====
 function wire() {
     const startBtn = document.getElementById('startBtn');
-    if (startBtn) startBtn.onclick = showMenu;
+    if (startBtn) startBtn.onclick = showIslandMap;
 
     const homeBtn = document.getElementById('homeBtn');
-    if (homeBtn) homeBtn.onclick = showMenu;
+    if (homeBtn) homeBtn.onclick = showIslandMap;
 
     const resetBtn = document.getElementById('resetBtn');
     if (resetBtn) resetBtn.onclick = () => {
@@ -114,7 +124,7 @@ function wire() {
     };
 
     const celebMenuBtn = document.getElementById('celebMenuBtn');
-    if (celebMenuBtn) celebMenuBtn.onclick = showMenu;
+    if (celebMenuBtn) celebMenuBtn.onclick = showIslandMap;
 
     const celebPdfBtn = document.getElementById('celebPdfBtn');
     if (celebPdfBtn) celebPdfBtn.onclick = () => downloadPrizePDF(state, getCurrentPhase());
@@ -142,7 +152,7 @@ function boot() {
     initEngine({
         state,
         onShowScreen: showScreen,
-        onShowMenu: showMenu,
+        onShowMenu: showIslandMap,
         onShowCelebration: showCelebrationScreen,
     });
 

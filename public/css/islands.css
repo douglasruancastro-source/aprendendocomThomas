@@ -1,0 +1,187 @@
+/* Mundo das Tres Ilhas — tela #islandMap (mapa interativo).
+   Importado depois de styles.css. Mantem .screen base (display/active/animation).
+   Paleta suave, infantil. Hotspots como <button> em % sobre o mapa para
+   responsividade transparente. */
+
+:root {
+    --island-sky: #5DADE2;
+    --island-sand: #F9E79F;
+    --island-coral: #F5B7B1;
+    --island-leaf: #82E0AA;
+    --island-sunny: #F7DC6F;
+    --island-shadow: 0 8px 24px rgba(31, 45, 61, 0.12);
+}
+
+#islandMap {
+    background: linear-gradient(180deg, #AED6F1 0%, #5DADE2 60%, #2E86C1 100%);
+    padding-top: 14px;
+    padding-bottom: 24px;
+    gap: 18px;
+}
+
+/* Header com a logo do Mundo das Ilhas */
+.map-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.map-logo {
+    max-width: 90vw;
+    max-height: 110px;
+    height: auto;
+    border-radius: 18px;
+    box-shadow: var(--island-shadow);
+    background: rgba(255, 255, 255, 0.65);
+    padding: 6px 14px;
+    object-fit: contain;
+    animation: pop 0.6s ease-out;
+}
+
+/* Container quadrado do mapa: aspect-ratio fixo garante hotspots em % alinhados */
+.map-canvas {
+    position: relative;
+    width: min(94vw, 720px);
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: var(--island-shadow);
+    background: var(--island-sky);
+}
+
+.map-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Hotspots clicaveis sobre as ilhas */
+.island-hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 22%;
+    aspect-ratio: 1 / 1;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: transform 0.25s ease, filter 0.25s ease;
+    animation: islandFadeIn 0.7s ease both;
+    border-radius: 50%;
+}
+
+.island-hotspot:hover,
+.island-hotspot:focus-visible {
+    transform: translate(-50%, -50%) scale(1.12);
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
+    outline: none;
+}
+
+.island-hotspot:active {
+    transform: translate(-50%, -50%) scale(0.98);
+}
+
+/* Posicoes: centradas via translate(-50%, -50%) para precisao em qualquer breakpoint */
+.island-letters  { top: 30%; left: 18%; animation-delay: 0.05s; }
+.island-numbers  { top: 22%; left: 80%; animation-delay: 0.15s; }
+.island-colors   { top: 73%; left: 26%; animation-delay: 0.25s; }
+.island-rewards  { top: 76%; left: 78%; animation-delay: 0.35s; }
+
+/* Mascotes flutuantes proximos da ilha */
+.island-mascot {
+    width: 72%;
+    height: 72%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #FFFDE7;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    background: #FFFDE7;
+    pointer-events: none;
+    animation: float 3s ease-in-out infinite;
+}
+
+.island-rewards .island-emoji {
+    font-size: clamp(36px, 6vw, 64px);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+    animation: float 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.island-label {
+    background: #FFFDE7;
+    color: #2E4053;
+    font-weight: 700;
+    font-size: clamp(14px, 1.8vw, 20px);
+    padding: 4px 12px;
+    border-radius: 999px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+    pointer-events: none;
+    margin-top: -4px;
+}
+
+@keyframes islandFadeIn {
+    from { opacity: 0; transform: translate(-50%, -30%) scale(0.6); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Filtro do menu: oculta secoes nao pertinentes quando #menu chega filtrado */
+/* "Letras" cobre alfabetizacao (1-8) E logica (9-12). Esconde so a Matematica. */
+#menu.filter-letters .section-label[data-section="math"],
+#menu.filter-letters #phasesGridMath {
+    display: none;
+}
+
+#menu.filter-numbers .section-label[data-section="alfa"],
+#menu.filter-numbers .section-label[data-section="logic"],
+#menu.filter-numbers #phasesGrid,
+#menu.filter-numbers #phasesGridLogic {
+    display: none;
+}
+
+#menu.filter-colors .section-label[data-section="alfa"],
+#menu.filter-colors .section-label[data-section="logic"],
+#menu.filter-colors .section-label[data-section="math"],
+#menu.filter-colors #phasesGrid,
+#menu.filter-colors #phasesGridLogic {
+    display: none;
+}
+#menu.filter-colors #phasesGridMath .phase-card[data-phase-id]:not([data-phase-id="13"]) {
+    display: none;
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+    .map-canvas {
+        width: 96vw;
+        border-radius: 20px;
+    }
+    .map-logo { max-height: 72px; padding: 4px 10px; }
+    .island-hotspot { width: 26%; }
+    .island-label { font-size: 13px; padding: 3px 9px; }
+
+    /* Reposiciona ligeiramente para nao sobrepor mascotes em telas estreitas */
+    .island-letters  { top: 28%; left: 22%; }
+    .island-numbers  { top: 22%; left: 76%; }
+    .island-colors   { top: 72%; left: 28%; }
+    .island-rewards  { top: 75%; left: 76%; }
+}
+
+@media (max-width: 380px) {
+    .island-mascot { border-width: 3px; }
+    .island-label { font-size: 12px; }
+    .map-logo { max-height: 60px; }
+}

@@ -28,16 +28,15 @@
     margin-top: 4px;
 }
 
+/* Fase 8: logo maior, sem caixa branca extra (a propria imagem ja tem fundo) */
 .map-logo {
     max-width: 90vw;
-    max-height: 110px;
+    max-height: clamp(80px, 14vh, 160px);
     height: auto;
-    border-radius: 18px;
-    box-shadow: var(--island-shadow);
-    background: rgba(255, 255, 255, 0.65);
-    padding: 6px 14px;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
     object-fit: contain;
-    animation: pop 0.6s ease-out;
+    animation: pop 0.6s ease-out, float 4s ease-in-out 0.6s infinite;
 }
 
 /* Container quadrado do mapa: aspect-ratio fixo garante hotspots em % alinhados */
@@ -94,11 +93,28 @@
     transform: translate(-50%, -50%) scale(0.98);
 }
 
-/* Posicoes: centradas via translate(-50%, -50%) para precisao em qualquer breakpoint */
+/* Fase 8: posicoes alinhadas com as ilhas reais do JPG (medidas direto na imagem) */
 .island-letters  { top: 30%; left: 18%; animation-delay: 0.05s; }
 .island-numbers  { top: 22%; left: 80%; animation-delay: 0.15s; }
-.island-colors   { top: 73%; left: 26%; animation-delay: 0.25s; }
-.island-rewards  { top: 76%; left: 78%; animation-delay: 0.35s; }
+.island-colors   { top: 76%; left: 24%; animation-delay: 0.25s; }
+.island-rewards  { top: 79%; left: 78%; animation-delay: 0.35s; }
+.island-syllables {
+    top: 18%; left: 47%;
+    width: 18%;
+    aspect-ratio: 3 / 4;
+    animation-delay: 0.45s;
+}
+.island-syllables .island-balloon {
+    font-size: clamp(40px, 7vw, 80px);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+    animation: float 3s ease-in-out infinite;
+    pointer-events: none;
+}
+.island-syllables .island-mascot-emoji {
+    font-size: clamp(20px, 3.5vw, 36px);
+    margin-top: -8px;
+    pointer-events: none;
+}
 
 /* Mascotes flutuantes proximos da ilha */
 .island-mascot {
@@ -138,6 +154,107 @@
     to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
+/* ===== Fase 7 - Game Feel: ambiente animado por ilha ===== */
+.map-ambient {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1; /* abaixo dos hotspots, acima do mapa */
+}
+
+.ambient-particle {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    will-change: transform, opacity;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.18));
+}
+
+/* Folhas caindo perto da ilha das Letras (top-left, em torno de 38%/18%) */
+@keyframes leafFall {
+    0%   { transform: translate(0, -10%) rotate(0deg); opacity: 0; }
+    15%  { opacity: 0.9; }
+    100% { transform: translate(40px, 60%) rotate(360deg); opacity: 0; }
+}
+.ambient-particle.leaf {
+    font-size: clamp(14px, 1.6vw, 22px);
+    animation: leafFall 6s linear infinite;
+}
+.ambient-particle.leaf.l1 { top: 18%;  left: 12%;  animation-delay: 0s;   }
+.ambient-particle.leaf.l2 { top: 22%;  left: 26%;  animation-delay: 2s;   }
+.ambient-particle.leaf.l3 { top: 32%;  left: 8%;   animation-delay: 4s;   }
+
+/* Nuvens passando perto do balao das Silabas (top-center 12%/50%) */
+@keyframes cloudPass {
+    0%   { transform: translateX(0);   opacity: 0; }
+    15%  { opacity: 0.65; }
+    85%  { opacity: 0.65; }
+    100% { transform: translateX(60vw); opacity: 0; }
+}
+.ambient-particle.cloud {
+    font-size: clamp(20px, 2.6vw, 36px);
+    opacity: 0.7;
+    animation: cloudPass 11s linear infinite;
+}
+.ambient-particle.cloud.c1 { top: 8%;  left: 20%; animation-delay: 1s; }
+.ambient-particle.cloud.c2 { top: 16%; left: 4%;  animation-delay: 6s; }
+
+/* Brilhos sutis na ilha dos Numeros (top-right 28%/80%) */
+@keyframes citySparkle {
+    0%, 100% { transform: scale(0.8); opacity: 0.2; }
+    50%      { transform: scale(1.2); opacity: 0.95; }
+}
+.ambient-particle.sparkle-city {
+    font-size: clamp(14px, 1.7vw, 22px);
+    animation: citySparkle 2.6s ease-in-out infinite;
+}
+.ambient-particle.sparkle-city.s1 { top: 18%; left: 70%; animation-delay: 0s; }
+.ambient-particle.sparkle-city.s2 { top: 22%; left: 90%; animation-delay: 1.3s; }
+
+/* Pequeno arco-iris flutuando perto da ilha das Cores (bottom-left 73%/26%) */
+@keyframes rainbowFloat {
+    0%, 100% { transform: translateY(0)   rotate(-6deg); opacity: 0.85; }
+    50%      { transform: translateY(-8px) rotate(6deg); opacity: 1; }
+}
+.ambient-particle.rainbow-bit {
+    font-size: clamp(20px, 2.4vw, 32px);
+    animation: rainbowFloat 4s ease-in-out infinite;
+}
+.ambient-particle.rainbow-bit.r1 { top: 60%; left: 14%; }
+
+/* Brilho dourado na ilha do Tesouro (bottom-right 76%/78%) */
+@keyframes treasureGlow {
+    0%, 100% { transform: scale(0.7) rotate(0deg);   opacity: 0.4; }
+    50%      { transform: scale(1.3) rotate(180deg); opacity: 1;   }
+}
+.ambient-particle.treasure-glow {
+    font-size: clamp(16px, 2vw, 26px);
+    color: #FFD54F;
+    animation: treasureGlow 2.4s ease-in-out infinite;
+}
+.ambient-particle.treasure-glow.t1 { top: 64%; left: 70%; animation-delay: 0s;   }
+.ambient-particle.treasure-glow.t2 { top: 84%; left: 88%; animation-delay: 1.2s; }
+
+/* ===== Halo de ilha 100% completa (Fase 7) ===== */
+@keyframes islandCompleteHalo {
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 213, 79, 0.55)) drop-shadow(0 6px 14px rgba(0,0,0,0.25)); }
+    50%      { filter: drop-shadow(0 0 18px rgba(255, 213, 79, 0.95)) drop-shadow(0 6px 14px rgba(0,0,0,0.25)); }
+}
+.island-hotspot.island-complete {
+    animation: islandFadeIn 0.7s ease both, islandCompleteHalo 3s ease-in-out infinite;
+}
+.island-hotspot.island-complete::after {
+    content: '\2B50';
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    font-size: clamp(18px, 2.4vw, 28px);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    pointer-events: none;
+    animation: starPulse 2s ease-in-out infinite;
+}
+
 /* Filtro do menu: oculta secoes nao pertinentes quando #menu chega filtrado */
 /* "Letras" cobre alfabetizacao (1-8) E logica (9-12). Esconde so a Matematica. */
 #menu.filter-letters .section-label[data-section="math"],
@@ -163,6 +280,15 @@
     display: none;
 }
 
+#menu.filter-syllables .section-label[data-section="alfa"],
+#menu.filter-syllables .section-label[data-section="logic"],
+#menu.filter-syllables .section-label[data-section="math"],
+#menu.filter-syllables #phasesGrid,
+#menu.filter-syllables #phasesGridLogic,
+#menu.filter-syllables #phasesGridMath {
+    display: none;
+}
+
 /* Responsivo */
 @media (max-width: 600px) {
     .map-canvas {
@@ -173,11 +299,12 @@
     .island-hotspot { width: 26%; }
     .island-label { font-size: 13px; padding: 3px 9px; }
 
-    /* Reposiciona ligeiramente para nao sobrepor mascotes em telas estreitas */
-    .island-letters  { top: 28%; left: 22%; }
+    /* Fase 8: aproxima dos centros para nao sobrepor entre si em viewport estreito */
+    .island-letters  { top: 30%; left: 22%; }
     .island-numbers  { top: 22%; left: 76%; }
-    .island-colors   { top: 72%; left: 28%; }
-    .island-rewards  { top: 75%; left: 76%; }
+    .island-colors   { top: 75%; left: 26%; }
+    .island-rewards  { top: 78%; left: 76%; }
+    .island-syllables { top: 18%; left: 49%; width: 22%; }
 }
 
 @media (max-width: 380px) {

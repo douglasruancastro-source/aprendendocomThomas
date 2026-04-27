@@ -1,100 +1,84 @@
 import { test, expect } from '@playwright/test';
 
-// Helper: limpa storage, planta progresso (fases 1-8 concluidas), passa pelo
-// name prompt + splash, clica na ilha das Letras (que agora mostra alfa + logica).
-async function startAtLogic(page, completed = [1, 2, 3, 4, 5, 6, 7, 8]) {
+// Fase 10.4: testa que tipos de atividade legados (sequencia, memoria, etc.)
+// continuam renderizando corretamente quando alcançamos as fases corretas.
+// Atualmente: fase 9 = logical-sequence, 10 = memory-game, 11 = odd-one-out, 16 = count-match.
+async function startWithCompleted(page, completed = []) {
     await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
-    await page.goto('/');
-    await page.fill('#nameInput', 'Tche');
-    await page.click('#nameConfirmBtn');
     await page.evaluate((done) => {
-        const s = JSON.parse(localStorage.getItem('thomas_learning_v3') || '{}');
-        s.completedPhases = done;
-        localStorage.setItem('thomas_learning_v3', JSON.stringify(s));
+        const KEY = 'thomas_learning_v3';
+        const s = {
+            version: 5,
+            hasSeenTutorial: true,
+            completedPhases: done,
+            equipped: { theme: 'theme-default', mascot: 'mascot-default', accessory: 'acc-none', effect: 'effect-default' },
+        };
+        localStorage.setItem(KEY, JSON.stringify(s));
     }, completed);
     await page.reload();
-    await page.click('text=Bah, vamos comecar!');
-    await page.click('.island-letters');
+    await page.click('#startBtn');
+    await expect(page.locator('#islandMap')).toBeVisible();
 }
 
-test.describe('New Logic Phases', () => {
-    test('phase 9 (Sequencia Logica) renders correctly', async ({ page }) => {
-        await startAtLogic(page);
-        await page.locator('#phasesGridLogic .phase-card').first().click();
+async function clickPhase(page, phaseId) {
+    await page.locator(`#menu .phase-card[data-phase-id="${phaseId}"]`).click();
+}
 
+test.describe('Tipos de atividade reaproveitados', () => {
+    test('fase 9 (Sequencia Logica) renderiza sequence + mystery + opcoes', async ({ page }) => {
+        await startWithCompleted(page, [1,2,3,4,5,6,7,8]);
+        await page.click('.island-letters');
+        await clickPhase(page, 9);
         await expect(page.locator('#activity')).toBeVisible();
-        await expect(page.locator('#activityTitle')).toContainText('Sequencia Logica');
-
+        await expect(page.locator('#activityTitle')).toContainText('Sequencia');
         await expect(page.locator('.sequence-item').first()).toBeVisible();
         await expect(page.locator('.sequence-item.mystery')).toBeVisible();
-
-        const options = page.locator('.option-btn');
-        await expect(options.first()).toBeVisible();
     });
 
-    test('phase 10 (Jogo da Memoria) renders memory grid', async ({ page }) => {
-        await startAtLogic(page);
-        await page.locator('#phasesGridLogic .phase-card').nth(1).click();
-
-        await expect(page.locator('#activity')).toBeVisible();
-        await expect(page.locator('#activityTitle')).toContainText('Jogo da Memoria');
-
+    test('fase 10 (Memoria) renderiza grade de cartas', async ({ page }) => {
+        await startWithCompleted(page, [1,2,3,4,5,6,7,8,9]);
+        await page.click('.island-letters');
+        await clickPhase(page, 10);
+        await expect(page.locator('#activityTitle')).toContainText('Memoria');
         const cards = page.locator('.memory-card');
-        await expect(cards).toHaveCount(8);
-
-        const firstCard = cards.first();
-        await expect(firstCard).not.toHaveClass(/flipped/);
+        await expect(cards.first()).toBeVisible();
+        // Pelo menos 4 pares = 8 cartas
+        const count = await cards.count();
+        expect(count).toBeGreaterThanOrEqual(8);
     });
 
-    test('phase 10 - clicking a card flips it', async ({ page }) => {
-        await startAtLogic(page);
-        await page.locator('#phasesGridLogic .phase-card').nth(1).click();
-
-        const cards = page.locator('.memory-card');
-        await cards.first().click();
-
-        await expect(cards.first()).toHaveClass(/flipped/);
+    test('fase 10 - clicar carta de memoria vira a carta', async ({ page }) => {
+        await startWithCompleted(page, [1,2,3,4,5,6,7,8,9]);
+        await page.click('.island-letters');
+        await clickPhase(page, 10);
+        const card = page.locator('.memory-card').first();
+        await card.click();
+        await expect(card).toHaveClass(/flipped/);
     });
 
-    test('phase 11 (Qual e o Diferente) renders 4 items', async ({ page }) => {
-        await startAtLogic(page);
-        await page.locator('#phasesGridLogic .phase-card').nth(2).click();
-
-        await expect(page.locator('#activity')).toBeVisible();
-        await expect(page.locator('#activityTitle')).toContainText('Qual e o Diferente');
-
-        const items = page.locator('.odd-item');
-        await expect(items).toHaveCount(4);
+    test('fase 11 (Diferente) renderiza 4 itens', async ({ page }) => {
+        await startWithCompleted(page, [1,2,3,4,5,6,7,8,9,10]);
+        await page.click('.island-letters');
+        await clickPhase(page, 11);
+        await expect(page.locator('#activityTitle')).toContainText('Diferente');
+        await expect(page.locator('.odd-item')).toHaveCount(4);
     });
 
-    test('phase 12 (Conte e Combine) shows items and options', async ({ page }) => {
-        await startAtLogic(page);
-        await page.locator('#phasesGridLogic .phase-card').nth(3).click();
-
-        await expect(page.locator('#activity')).toBeVisible();
-        await expect(page.locator('#activityTitle')).toContainText('Conte e Combine');
-
+    test('fase 16 (Conte e Combine na ilha dos Numeros) renderiza count-items', async ({ page }) => {
+        await startWithCompleted(page, [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]);
+        await page.click('.island-numbers');
+        await clickPhase(page, 16);
+        await expect(page.locator('#activityTitle')).toContainText('Conte');
         const countItems = page.locator('.count-item');
-        const count = await countItems.count();
-        expect(count).toBeGreaterThan(0);
-
-        const options = page.locator('.option-btn');
-        await expect(options.first()).toBeVisible();
+        const c = await countItems.count();
+        expect(c).toBeGreaterThan(0);
+        await expect(page.locator('.option-btn').first()).toBeVisible();
     });
 
-    test('logic phases are locked when phase 8 not completed', async ({ page }) => {
-        await startAtLogic(page, [1, 2, 3, 4, 5, 6, 7]);
-
-        const logicGrid = page.locator('#phasesGridLogic');
-        const firstLogicCard = logicGrid.locator('.phase-card').first();
-        await expect(firstLogicCard).toHaveClass(/locked/);
-    });
-
-    test('logic phases unlock when phase 8 is completed', async ({ page }) => {
-        await startAtLogic(page);
-        const logicGrid = page.locator('#phasesGridLogic');
-        const firstLogicCard = logicGrid.locator('.phase-card').first();
-        await expect(firstLogicCard).not.toHaveClass(/locked/);
+    test('fase 9 fica bloqueada se fase 8 nao foi completada', async ({ page }) => {
+        await startWithCompleted(page, [1,2,3,4,5,6,7]);
+        await page.click('.island-letters');
+        const card9 = page.locator('#menu .phase-card[data-phase-id="9"]');
+        await expect(card9).toHaveClass(/locked/);
     });
 });

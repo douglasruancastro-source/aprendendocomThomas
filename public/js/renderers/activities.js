@@ -5,6 +5,7 @@
 import { shuffle } from '../utils.js';
 import { SVG, SHAPE_SVG } from '../data/svg.js';
 import { soundClick, soundFlipCard, soundMatch, speak } from '../audio.js';
+import { renderSyllableBuild } from './syllableBuild.js';
 
 // ---------- Fase 1 & 2: Encontrar Vogais / Consoantes ----------
 export function renderFindLetters(ctx, round) {
@@ -55,15 +56,19 @@ export function renderSyllables(ctx, round) {
     display.className = 'big-display';
     display.textContent = round.syllable;
     display.style.fontSize = '72px';
+    // Fase 11.2: pronuncia a silaba assim que aparece, para reforco auditivo.
+    setTimeout(() => speak(round.syllable), 250);
     const options = document.createElement('div');
     options.className = 'options-grid';
     shuffle(round.options).forEach((opt) => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
         btn.textContent = opt;
+        if (opt === round.syllable) btn.dataset.correct = 'true'; // 9.15 Dica
         btn.onclick = async () => {
             const isCorrect = opt === round.syllable;
             btn.classList.add(isCorrect ? 'correct' : 'wrong');
+            if (isCorrect) speak(round.syllable); // 11.2 reforco no acerto
             await showFeedback(isCorrect);
             onAnswer(isCorrect);
         };
@@ -119,6 +124,7 @@ export function renderBuildWord(ctx, round) {
             updateSlots();
             if (typed.length === round.word.length) {
                 const isCorrect = typed.join('') === round.word;
+                if (isCorrect) speak(round.word); // 11.2 le a palavra montada
                 await showFeedback(isCorrect, isCorrect ? 'Muito bem!' : `A palavra era: ${round.word}`);
                 onAnswer(isCorrect);
             }
@@ -148,12 +154,15 @@ export function renderReadMatch(ctx, round) {
     const display = document.createElement('div');
     display.className = 'big-display';
     display.textContent = round.word;
+    // 11.2: le a palavra para crianca pequena que ainda esta aprendendo a ler.
+    setTimeout(() => speak(round.word), 300);
     const options = document.createElement('div');
     options.className = 'options-grid';
     shuffle(round.options).forEach((opt) => {
         const imgBtn = document.createElement('div');
         imgBtn.className = 'image-option';
         imgBtn.innerHTML = SVG[opt] || `<span>${opt}</span>`;
+        if (opt === round.correct) imgBtn.dataset.correct = 'true'; // 9.15 Dica
         imgBtn.onclick = async () => {
             const isCorrect = opt === round.correct;
             imgBtn.classList.add(isCorrect ? 'correct' : 'wrong');
@@ -186,10 +195,14 @@ export function renderFillBlank(ctx, round) {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
         btn.textContent = opt;
+        if (opt === correctLetter) btn.dataset.correct = 'true'; // 9.15 Dica
         btn.onclick = async () => {
             const isCorrect = opt === correctLetter;
             btn.classList.add(isCorrect ? 'correct' : 'wrong');
-            if (isCorrect) display.textContent = round.word;
+            if (isCorrect) {
+                display.textContent = round.word;
+                speak(round.word); // 11.2 le a palavra completa apos preencher
+            }
             await showFeedback(isCorrect);
             onAnswer(isCorrect);
         };
@@ -245,6 +258,7 @@ export function renderTypeWord(ctx, round) {
                 updateDisplay();
                 if (typed.length === round.word.length) {
                     const isCorrect = typed.join('') === round.word;
+                    if (isCorrect) speak(round.word); // 11.2 le palavra digitada
                     await showFeedback(isCorrect, isCorrect ? 'Muito bem!' : `A palavra era: ${round.word}`);
                     onAnswer(isCorrect);
                 }
@@ -358,6 +372,7 @@ export function renderLogicalSequence(ctx, round) {
         } else {
             btn.textContent = opt;
         }
+        if (opt === round.answer) btn.dataset.correct = 'true'; // 9.15 Dica
         btn.onclick = async () => {
             const isCorrect = opt === round.answer;
             btn.classList.add(isCorrect ? 'correct' : 'wrong');
@@ -468,6 +483,7 @@ export function renderOddOneOut(ctx, round) {
         el.innerHTML =
             `${SVG[item] || `<span style="font-size:48px;font-weight:700">${item}</span>`}` +
             `<div class="odd-label">${round.labels[idx]}</div>`;
+        if (idx === round.oddIdx) el.dataset.correct = 'true'; // 9.15 Dica
         el.onclick = async () => {
             const isCorrect = idx === round.oddIdx;
             el.classList.add(isCorrect ? 'correct' : 'wrong');
@@ -518,6 +534,7 @@ export function renderCountMatch(ctx, round) {
         btn.textContent = opt;
         btn.style.fontSize = '40px';
         btn.style.minWidth = '70px';
+        if (opt === String(round.count)) btn.dataset.correct = 'true'; // 9.15 Dica
         btn.onclick = async () => {
             const isCorrect = opt === String(round.count);
             btn.classList.add(isCorrect ? 'correct' : 'wrong');
@@ -568,6 +585,7 @@ export function renderColorMatch(ctx, round) {
         } else {
             btn.textContent = opt.name;
         }
+        if (opt.hex === round.correctHex) btn.dataset.correct = 'true'; // 9.15 Dica
         btn.onclick = async () => {
             soundClick();
             const isCorrect = opt.hex === round.correctHex;
@@ -601,6 +619,7 @@ export function renderNumberRecognize(ctx, round) {
             item.innerHTML = SHAPE_SVG[round.item] || SHAPE_SVG.star;
             group.appendChild(item);
         }
+        if (count === round.correctCount) group.dataset.correct = 'true'; // 9.15 Dica
         group.onclick = async () => {
             soundClick();
             const isCorrect = count === round.correctCount;
@@ -658,6 +677,7 @@ function renderMathOperation(ctx, round) {
         const btn = document.createElement('button');
         btn.className = 'option-btn math-option';
         btn.textContent = String(opt);
+        if (opt === round.answer) btn.dataset.correct = 'true'; // 9.15 Dica
         btn.onclick = async () => {
             soundClick();
             const isCorrect = opt === round.answer;
@@ -692,4 +712,5 @@ export const ACTIVITY_RENDERERS = {
     'number-recognize': renderNumberRecognize,
     'math-add':         renderMathAdd,
     'math-sub':         renderMathSub,
+    'syllable-build':   renderSyllableBuild,
 };

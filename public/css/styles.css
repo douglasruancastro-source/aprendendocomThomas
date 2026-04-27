@@ -134,6 +134,81 @@ body {
     50% { filter: brightness(1.08); }
 }
 
+/* ===== Fase 7 — Game Feel ===== */
+
+/* Sparkle: estrela pequena que cresce, gira e some */
+@keyframes sparkleBurst {
+    0%   { transform: translate(-50%, -50%) scale(0) rotate(0deg);   opacity: 0;   }
+    20%  { opacity: 1; }
+    100% { transform: translate(var(--dx, 0), var(--dy, 0)) scale(1.4) rotate(180deg); opacity: 0; }
+}
+
+/* Shake horizontal real para erros (complementa o wobble rotacional) */
+@keyframes shakeX {
+    0%, 100% { transform: translateX(0); }
+    15%  { transform: translateX(-12px); }
+    30%  { transform: translateX(11px); }
+    45%  { transform: translateX(-8px); }
+    60%  { transform: translateX(7px); }
+    75%  { transform: translateX(-4px); }
+    90%  { transform: translateX(3px); }
+}
+
+/* Aura quente quando streak >= 3 */
+@keyframes streakHotPulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(255,138,101,0.45), 0 0 18px 4px rgba(255,138,101,0.25); }
+    50%      { box-shadow: 0 0 0 7px rgba(255,138,101,0.65), 0 0 28px 8px rgba(255,138,101,0.45); }
+}
+
+/* Sparkle layer dentro do feedback overlay */
+.feedback-overlay .sparkle-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+.feedback-overlay .sparkle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 22px;
+    height: 22px;
+    color: #FFD54F;
+    font-size: 22px;
+    line-height: 1;
+    text-shadow: 0 0 6px rgba(255,213,79,0.9), 0 0 14px rgba(255,138,101,0.7);
+    animation: sparkleBurst 800ms ease-out forwards;
+    will-change: transform, opacity;
+}
+
+/* Shake aplicado em alvos clicaveis no erro */
+.wrong-shake { animation: shakeX 0.45s ease both; }
+
+/* Streak hot: aura na area de atividade */
+body.streak-hot #activity {
+    animation: streakHotPulse 1.6s ease-in-out infinite;
+    border-radius: var(--radius-lg, 28px);
+}
+
+/* Confete inline (streak burst) - cai do topo da tela em forma de chuva */
+.streak-burst-layer {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 70vh;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 150;
+}
+.streak-burst-layer .streak-confetti {
+    position: absolute;
+    top: -24px;
+    width: 10px;
+    height: 14px;
+    border-radius: 2px;
+    animation: confettiDrop 1.2s ease-in forwards;
+    will-change: transform, opacity;
+}
+
 .wobble { animation: wobble 0.5s ease; }
 .pop { animation: pop 0.4s ease; }
 
@@ -208,10 +283,11 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
 }
 
 /* ===== SPLASH ===== */
+/* Fase 8: gradient azul-ceu igual ao do #islandMap (substituiu cores RS) */
 #splash {
-    background: linear-gradient(180deg, #E53935 0%, #E53935 30%, #FFEB3B 30%, #FFEB3B 58%, #2E7D32 58%, #2E7D32 100%);
+    background: linear-gradient(180deg, #AED6F1 0%, #5DADE2 55%, #2E86C1 100%);
     background-size: 100% 200%;
-    animation: gradientBG 10s ease infinite;
+    animation: gradientBG 12s ease infinite;
     justify-content: center;
     gap: 20px;
     position: relative;
@@ -237,17 +313,19 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
     font-weight: 700;
     color: white;
     text-align: center;
-    text-shadow: 3px 3px 0 #B71C1C, -1px -1px 0 #2E7D32, 4px 4px 8px rgba(0,0,0,0.35);
+    /* Fase 8: text-shadow azul (substituiu vermelho/verde RS) */
+    text-shadow: 3px 3px 0 #1565C0, -1px -1px 0 #2E86C1, 4px 4px 8px rgba(0,0,0,0.35);
     animation: float 3s ease-in-out infinite;
     letter-spacing: 1px;
 }
 
 #splash .subtitle {
     font-size: 28px;
-    color: #FFF8E1;
+    color: #FFFFFF;
     text-align: center;
     text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-    background: rgba(183,28,28,0.55);
+    /* Fase 8: subtitle bg azul translucent (substituiu vermelho RS) */
+    background: rgba(46, 134, 193, 0.55);
     padding: 8px 16px;
     border-radius: 14px;
 }
@@ -298,10 +376,9 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
     display: flex;
     align-items: center;
     gap: 8px;
-    background: white;
-    border-radius: 18px;
-    padding: 10px 18px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
     font-size: 24px;
     font-weight: 700;
     color: #333;
@@ -611,7 +688,7 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
 .letter-bubble:hover { transform: scale(1.1); }
 .letter-bubble.selected { background: #BBDEFB; border-color: #42A5F5; }
 .letter-bubble.correct { background: #C8E6C9; border-color: #66BB6A; }
-.letter-bubble.wrong { background: #FFE0B2; border-color: #FFA726; animation: wobble 0.5s; }
+.letter-bubble.wrong { background: #FFE0B2; border-color: #FFA726; animation: shakeX 0.45s ease; }
 
 .big-display {
     font-size: 64px;
@@ -670,7 +747,7 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
 
 .option-btn:hover { transform: scale(1.05); border-color: #90CAF9; }
 .option-btn.correct { background: #C8E6C9; border-color: #66BB6A; }
-.option-btn.wrong { background: #FFE0B2; border-color: #FFA726; animation: wobble 0.5s; }
+.option-btn.wrong { background: #FFE0B2; border-color: #FFA726; animation: shakeX 0.45s ease; }
 .option-btn.used { opacity: 0.4; pointer-events: none; }
 .option-btn.draggable { cursor: grab; touch-action: none; }
 .option-btn.dragging { opacity: 0.5; cursor: grabbing; }
@@ -700,7 +777,7 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
 
 .image-option:hover { transform: scale(1.05); border-color: #90CAF9; }
 .image-option.correct { border-color: #66BB6A; background: #C8E6C9; }
-.image-option.wrong { border-color: #FFA726; background: #FFE0B2; animation: wobble 0.5s; }
+.image-option.wrong { border-color: #FFA726; background: #FFE0B2; animation: shakeX 0.45s ease; }
 .image-option svg { width: 100%; height: 100%; }
 
 .svg-display {
@@ -897,7 +974,7 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
 
 .odd-item:hover { transform: scale(1.05); border-color: #90CAF9; }
 .odd-item.correct { border-color: #66BB6A; background: #C8E6C9; }
-.odd-item.wrong { border-color: #FFA726; background: #FFE0B2; animation: wobble 0.5s; }
+.odd-item.wrong { border-color: #FFA726; background: #FFE0B2; animation: shakeX 0.45s ease; }
 .odd-item svg { width: 80px; height: 80px; }
 .odd-item .odd-label { font-size: 18px; font-weight: 700; margin-top: 6px; }
 
@@ -942,6 +1019,33 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
 #mascot.happy { animation: bounce 0.6s ease; }
 #mascot.sad { animation: wobble 0.5s ease; }
 #mascot.celebrating { animation: bounce 0.6s ease infinite; }
+
+/* Fase 9 - Onda 1: posicoes do mascote por tela (sai do caminho dos botoes). */
+body[data-screen="splash"] #mascot {
+    /* Posicionado no canto inferior direito sem cobrir botoes */
+    bottom: 16px;
+    right: 16px;
+    width: 72px; height: 72px;
+    z-index: 5;
+}
+body[data-screen="islandMap"] #mascot,
+body[data-screen="menu"] #mascot,
+body[data-screen="badges"] #mascot,
+body[data-screen="parents"] #mascot,
+body[data-screen="shop"] #mascot {
+    bottom: 96px; /* acima da main-nav */
+    right: 12px;
+    width: 64px; height: 64px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+}
+body[data-screen="splash"] #mascot.idle,
+body[data-screen="islandMap"] #mascot.idle,
+body[data-screen="menu"] #mascot.idle,
+body[data-screen="badges"] #mascot.idle,
+body[data-screen="shop"] #mascot.idle,
+body[data-screen="parents"] #mascot.idle {
+    animation: float 3.5s ease-in-out infinite;
+}
 
 /* ===== FEEDBACK ===== */
 .feedback-overlay {
@@ -1078,7 +1182,41 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
     font-weight: 700;
 }
 
-.badge-notification .badge-notif-icon { font-size: 36px; }
+.badge-notification { position: fixed; overflow: visible; }
+.badge-notification .badge-notif-icon { font-size: 36px; position: relative; z-index: 2; }
+.badge-notification .badge-notif-text { position: relative; z-index: 2; }
+
+/* Fase 7 - Game Feel: particulas explodindo do icone da medalha */
+.badge-notification .badge-particles {
+    position: absolute;
+    top: 30px;
+    left: 38px;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 1;
+}
+.badge-notification .badge-particle {
+    position: absolute;
+    top: 0; left: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #FFD54F;
+    box-shadow: 0 0 8px rgba(255, 213, 79, 0.95);
+    animation: particleBurst 1.4s ease-out forwards;
+    will-change: transform, opacity;
+}
+.badge-notification[data-rarity="rare"] .badge-particle      { background: #29B6F6; box-shadow: 0 0 8px rgba(41, 182, 246, 0.95); }
+.badge-notification[data-rarity="epic"] .badge-particle      { background: #BA68C8; box-shadow: 0 0 8px rgba(186, 104, 200, 0.95); }
+.badge-notification[data-rarity="legendary"] .badge-particle { background: #FFB300; box-shadow: 0 0 10px rgba(255, 179, 0, 1); }
+
+@keyframes particleBurst {
+    0%   { transform: translate(0, 0) scale(0.4); opacity: 0; }
+    20%  { opacity: 1; }
+    100% { transform: translate(var(--dx, 0), var(--dy, 0)) scale(1.1); opacity: 0; }
+}
 
 /* ===== SHOP ===== */
 #shop {
@@ -1227,7 +1365,7 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
 .number-option-group { min-height: 110px; background: #FFFDE7; border: 3px solid #FBC02D; border-radius: 14px; padding: 10px; cursor: pointer; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center; transition: transform 0.15s ease; }
 .number-option-group:hover { transform: scale(1.03); }
 .number-option-group.correct { background: #C8E6C9; border-color: #2E7D32; animation: pop 0.4s ease; }
-.number-option-group.wrong { background: #FFCDD2; border-color: #B71C1C; animation: wobble 0.4s ease; }
+.number-option-group.wrong { background: #FFCDD2; border-color: #B71C1C; animation: shakeX 0.45s ease; }
 .number-item { width: 28px; height: 28px; }
 .number-item svg { width: 100%; height: 100%; }
 

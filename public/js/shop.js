@@ -5,11 +5,13 @@ import { SHOP_ITEMS, shopItemById, defaultItemId } from './data/shop.js';
 import { spendCoins, checkBadges } from './rewards.js';
 
 // Retorna true se o usuário atende os requisitos do item (pré-requisitos de progressão).
+// Fase 9 - Onda 2: agora suporta `requires.badge` (medalha que destranca o item).
 export function meetsRequirements(item, state) {
     if (!item || !item.requires) return true;
     const req = item.requires;
     if (req.totalCoinsEarned != null && (state.totalCoinsEarned || 0) < req.totalCoinsEarned) return false;
     if (req.completedPhases != null && (state.completedPhases.length || 0) < req.completedPhases) return false;
+    if (req.badge != null && !(state.badges || []).includes(req.badge)) return false;
     return true;
 }
 
@@ -26,12 +28,25 @@ export function isEquipped(item, state) {
 }
 
 // Tenta comprar: retorna { ok, reason }. 'reason' descreve a falha para UI.
+// Fase 9 - Onda 3: powerups (consumable=true) podem ser comprados varias vezes;
+// cada compra incrementa state.powerups[id]. Outros itens permanecem em ownedItems.
 export function buyItem(state, itemId) {
     const item = shopItemById(itemId);
     if (!item) return { ok: false, reason: 'item-inexistente' };
-    if (isOwned(item, state)) return { ok: false, reason: 'ja-comprado' };
     if (!meetsRequirements(item, state)) return { ok: false, reason: 'bloqueado' };
     if ((state.coins || 0) < item.price) return { ok: false, reason: 'moedas-insuficientes' };
+
+    // Consumiveis acumulam estoque, nao usam ownedItems.
+    if (item.consumable) {
+        if (!spendCoins(state, item.price)) return { ok: false, reason: 'moedas-insuficientes' };
+        if (!state.powerups) state.powerups = {};
+        state.powerups[item.id] = (state.powerups[item.id] || 0) + 1;
+        checkBadges(state);
+        return { ok: true, item, consumable: true, stock: state.powerups[item.id] };
+    }
+
+    // Itens normais (theme/mascot/accessory/effect/frame) — comprados uma vez.
+    if (isOwned(item, state)) return { ok: false, reason: 'ja-comprado' };
     if (!spendCoins(state, item.price)) return { ok: false, reason: 'moedas-insuficientes' };
     if (!state.ownedItems) state.ownedItems = [];
     state.ownedItems.push(item.id);
@@ -39,29 +54,52 @@ export function buyItem(state, itemId) {
     return { ok: true, item };
 }
 
+// Consome 1 unidade do powerup. Retorna true se tinha estoque, false caso contrario.
+// Fase 9 - Onda 3
+export function consumePowerup(state, powerupId) {
+    if (!state.powerups || !state.powerups[powerupId]) return false;
+    state.powerups[powerupId]--;
+    if (state.powerups[powerupId] <= 0) delete state.powerups[powerupId];
+    return true;
+}
+
+export function powerupStock(state, powerupId) {
+    return (state.powerups && state.powerups[powerupId]) || 0;
+}
+
 // Equipa um item. O item precisa estar comprado (ou ser default).
+// Fase 9 - Onda 2: registra historico de visuais ja equipados (para a medalha 'fashionista').
 export function equipItem(state, itemId) {
     const item = shopItemById(itemId);
     if (!item) return { ok: false, reason: 'item-inexistente' };
     if (!isOwned(item, state)) return { ok: false, reason: 'nao-comprado' };
     if (!state.equipped) state.equipped = {};
     state.equipped[item.category] = item.id;
+    if (!state.equippedHistory) state.equippedHistory = [];
+    if (!state.equippedHistory.includes(item.id)) state.equippedHistory.push(item.id);
     return { ok: true, item };
 }
 
-// Aplica tema atual ao <body>. Chamado no boot e após equipar.
+// Aplica tema atual via CSS var --theme-bg para que TODAS as screens herdem.
+// Antes setava body.style.background, mas como cada .screen tem seu proprio bg
+// no CSS, o tema ficava invisivel. Agora as screens usam var(--theme-bg, default).
 export function applyTheme(state) {
     const themeId = (state.equipped && state.equipped.theme) || defaultItemId('theme');
     const theme = shopItemById(themeId);
     if (!theme) return;
-    const body = document.body;
-    if (theme.bg) body.style.background = theme.bg;
-    else body.style.background = ''; // volta ao CSS default
-    if (theme.title) {
-        document.documentElement.style.setProperty('--title-color', theme.title);
+    const root = document.documentElement;
+    if (theme.bg) {
+        root.style.setProperty('--theme-bg', theme.bg);
+        root.dataset.themeActive = '1';
+    } else {
+        root.style.removeProperty('--theme-bg');
+        delete root.dataset.themeActive;
     }
-    body.classList.toggle('theme-animated', !!theme.animated);
-    body.dataset.theme = theme.id;
+    if (theme.title) {
+        root.style.setProperty('--title-color', theme.title);
+    }
+    document.body.classList.toggle('theme-animated', !!theme.animated);
+    document.body.dataset.theme = theme.id;
 }
 
 // Lista completa com metadados computados para a tela da loja.

@@ -144,6 +144,249 @@ Antes do primeiro `test:e2e`: `npx playwright install`.
 - [x] **4.2** `npm run dev` + verificação manual via preview MCP (mapa, navegação por todas as 4 ilhas, filtros, home button, mobile 375x812) — *2026-04-24*
 - [x] **4.3** `git add` + commit final com tudo — *2026-04-24*
 
+### Fase 5 — Refactor UX/UI v2 (paleta infantil + 5a ilha + medalhas/parents)
+
+- [x] **5.1** Criar [public/css/design-system.css](public/css/design-system.css) com tokens (paleta sem vermelho agressivo, raios infantis, tap-min 48px) — *2026-04-24*
+- [x] **5.2** Criar componentes reutilizaveis em [public/js/components/](public/js/components/): Button, Card, LevelCard, CurrencyBadge — *2026-04-24*
+- [x] **5.3** Refatorar #splash: logo grande + mascotes-grupo + 2 botoes (Comecar / Area dos pais); remover bloco #namePrompt — *2026-04-24*
+- [x] **5.4** Limpar [public/js/main.js](public/js/main.js): remover refs a namePrompt; getPlayerName default 'Guri' — *2026-04-24*
+- [x] **5.5** Atualizar [public/js/renderers/menu.js](public/js/renderers/menu.js) para usar LevelCard, suportar filter 'syllables', remover badges inline — *2026-04-24*
+- [x] **5.6** Criar tela #badges separada com [public/js/renderers/badges.js](public/js/renderers/badges.js) (grid grande com nome, descricao e estado) — *2026-04-24*
+- [x] **5.7** Criar tela #parents placeholder ("Em breve!") — *2026-04-24*
+- [x] **5.8** Adicionar barra fixa `<nav class="main-nav">` (Jogar / Medalhas / Loja) no rodape de #islandMap, #menu, #shop, #badges, #parents — *2026-04-24*
+- [x] **5.9** Adicionar 5a ilha "Sons & Silabas" como balao no mapa: hotspot em [public/index.html](public/index.html), CSS em [public/css/islands.css](public/css/islands.css) (top 12% / left 50%), filter-syllables — *2026-04-24*
+- [x] **5.10** Criar fases 17-20 (`type: 'syllable-build'`) em [public/js/data/phases.js](public/js/data/phases.js) + ROUNDS_PER_PHASE — *2026-04-24*
+- [x] **5.11** Criar `SYLLABLE_BUILD_ROUNDS` (mecanica GA+TO=GATO) em [public/js/data/syllables.js](public/js/data/syllables.js) — *2026-04-24*
+- [x] **5.12** Registrar POOLS[17..20] em [public/js/rounds.js](public/js/rounds.js) e renderer 'syllable-build' em [public/js/renderers/activities.js](public/js/renderers/activities.js) (renderer novo em [public/js/renderers/syllableBuild.js](public/js/renderers/syllableBuild.js)) — *2026-04-24*
+- [x] **5.13** Polish da loja: XSS hardening (createElement em vez de innerHTML), CurrencyBadge no banner, selo "Equipado", emojis nas categorias, rename "Cores do Mascote" → "Mascotes" — *2026-04-24*
+- [x] **5.14** Reposicionar 4 hotspots existentes (letras top 38%, numeros top 28%) para nao colidir com balao — *2026-04-24*
+- [x] **5.15** Estados visuais do .phase-card: data-state="locked|available|completed", overlay 🔒, animacao pulse no available — *2026-04-24*
+- [x] **5.16** `npm test` 122/122 verde + verificacao via preview MCP (splash sem name prompt, 5 ilhas, syllable-build funcional, badges/parents acessiveis pela main-nav, mobile 375x812 sem overflow) — *2026-04-24*
+- [ ] **5.17** Atualizar specs E2E (helpers sem name prompt; novos specs para badges/shop/parents/syllables) — *pendente*
+- [ ] **5.18** Commit + push final — *aguardando confirmacao do usuario*
+
+### Fase 12 — Conteúdo, modo livre e polish (3 ondas)
+
+**Objetivo:** dar profundidade ao conteúdo (variação por tier dentro da ilha), oferecer modo livre de treino para crianças que querem revisar fases dominadas e polir mensagens motivacionais.
+
+#### Onda 1 — Tier-aware difficulty
+
+- [x] **12.1** [public/js/rounds.js](public/js/rounds.js) novo helper `effectiveLevel(state, phase)` combina `getDifficultyLevel` adaptativo com `tierForPhase`. Tier 1 (fases 1-5 da ilha): nivel apenas adaptativo. Tier 2 (6-10): igual. **Tier 3 (11-15)**: força `level >= 2` (dificuldade alta) mesmo se a criança está com baixa performance adaptativa. Garante progressão dentro da ilha sem precisar de pools por fase — *2026-04-26*
+
+#### Onda 2 — Modo Revisão (treino livre)
+
+- [x] **12.2** Engine.js suporte a `startActivity(phaseId, { review: true })`: marca `session.isReview`, prefixa título da atividade com "🎲 Revisao: ". Em `onAnswer`, **moedas reduzidas em 50%** (anti-farming, deduz a metade do que `rewardForAnswer` creditou). Em `showResult`, se review: pula `completedPhases.push`, pula `onPhaseCompleted`, pula cerimônia de ilha, pula update de medalhas/dificuldade adaptativa — só mostra resultado e volta ao menu — *2026-04-26*
+- [x] **12.2** Botão "🎲 Treinar" no header da ilha em [public/js/renderers/menu.js](public/js/renderers/menu.js): só aparece se `completedInIsland > 0`. Click sortea fase aleatória já completada da ilha e dispara callback `onStartReview(phaseId)`. Wire-up em [public/js/main.js](public/js/main.js) `showMenu` passa novo callback que chama `startActivity(phaseId, { review: true })`. CSS `.menu-train-btn` (border azul, ícone 🎲, hover lift) — *2026-04-26*
+- [x] **12.2** Verificação MCP em mobile (375x812): Ilha das Letras com 5/15 fases mostra botão "🎲 Treinar" no canto direito do header verde — *2026-04-26*
+
+#### Onda 3 — Mensagens motivacionais variadas
+
+- [x] **12.3** [public/js/engine.js](public/js/engine.js) `showResult` agora calcula 5 faixas de score com emoji + mensagem específica:
+  - **Perfeito (100%):** 🏆 "{nome}, voce arrasou! 100% perfeito!"
+  - **95%+:** 🌟 "Quase perfeito, {nome}! Voce e um craque!"
+  - **85%+:** 🎉 "Excelente trabalho! Continue assim!"
+  - **70%+:** 👍 "Mandou bem! Voce esta aprendendo rapido!"
+  - **<70% (não passou):** 💪 "Cada erro te ensina algo. Tenta de novo!"
+  - **Modo Revisão:** título substitui "Parabens" por "{nome}, treino completo!" — *2026-04-26*
+
+#### Resultado final
+
+- [x] **12.4** `npm run test` → **126/126 verde** (lógica intacta, tier filtering só usa funções já existentes) — *2026-04-26*
+- [x] **12.5** Verificação MCP: tier 3 força level 2 nas fases finais; modo revisão consome 50% das moedas e não atualiza progresso; mensagens variadas no #result conforme score real — *2026-04-26*
+
+### Fase 11 — Closure educacional, áudio e backup (3 ondas)
+
+**Objetivo:** fechar o loop educacional (cerimônia ao terminar uma ilha), enriquecer áudio nas atividades (reforço auditivo) e dar utilidade real para os pais (backup do progresso).
+
+#### Onda 1 — Cerimônia de ilha completa
+
+- [x] **11.1** `showIslandCompletionCelebration(island, bonusCoins)` em [public/js/renderers/feedback.js](public/js/renderers/feedback.js): overlay full-screen com card central usando `--island-color` da ilha, mascote da ilha (Tomi/Ro/Livi via `<img>`, ou emoji para clouds/treasure), título "🎉 Voce conquistou!" + nome da ilha em destaque, mensagem "{Mascote} esta orgulhoso de voce!", badge "+500 moedas de bonus", 50 partículas de confete usando `confettiDrop`. CSS em [public/css/design-system.css](public/css/design-system.css) com `.island-completion-card` 5px border na cor da ilha, `rankupZoom` na entrada, mascote 120-180px com border colorido + animação `bounce` 0.4s — *2026-04-26*
+- [x] **11.1** Hook em [public/js/engine.js](public/js/engine.js) `showResult`: após `firstTime` push, calcula `islandForPhase(phase.id)`, verifica se TODAS as fases da ilha estão em `completedPhases`. Se sim, credita +500 moedas via `addCoins` e dispara `showIslandCompletionCelebration` após delay de 2200ms (deixa toasts de moeda/medalha aparecerem primeiro) — *2026-04-26*
+- [x] **11.1** Verificação MCP: `showIslandCompletionCelebration(ISLANDS[0], 500)` mostrou Tomi capivara gigante centralizado, "Voce conquistou! / Ilha das Letras" em verde, "Todas as 15 fases completas! Tomi esta orgulhoso de voce!", "+500 moedas de bonus" + botão "Continuar a aventura". Confete colorido caindo no fundo — *2026-04-26*
+
+#### Onda 2 — Áudio enriquecido em renderers
+
+- [x] **11.2** Adicionado `speak()` em mais 4 renderers em [public/js/renderers/activities.js](public/js/renderers/activities.js):
+  - **renderSyllables** (fase 3 + 46-60): pronuncia a sílaba ao aparecer (300ms delay) + ao acertar
+  - **renderBuildWord** (fases 4, 12 e variantes): pronuncia palavra ao montar corretamente
+  - **renderReadMatch** (fase 5, 13): pronuncia a palavra escrita assim que aparece
+  - **renderFillBlank** (fase 6 e variantes): pronuncia palavra completa após preencher letra correta
+  - **renderTypeWord** (fase 7, 15): pronuncia a palavra digitada ao acertar
+  - Já tinham `speak()`: color-match, count-match, number-recognize, math-add/sub — *2026-04-26*
+
+#### Onda 3 — Backup/Restore JSON
+
+- [x] **11.3** Seção "💾 Backup do progresso" no dashboard da Área dos Pais ([public/js/renderers/parents.js](public/js/renderers/parents.js)):
+  - **Exportar progresso:** gera Blob JSON do `state` com `URL.createObjectURL`, dispara download com nome `educatche-progresso-YYYY-MM-DD.json`
+  - **Importar progresso:** abre `<input type="file" accept=".json">`, lê via `file.text()`, parsea JSON, valida estrutura mínima (precisa ter `completedPhases` array), confirma com o usuário, sobrescreve o state (preserva referência), salva e recarrega
+  - CSS `.parents-backup` (border azul, help text, 2 botões side-by-side) — *2026-04-26*
+- [x] **11.3** Verificação MCP: dashboard mostra seção backup com 2 botões (Exportar + Importar). Mascote já visível no canto em todas as telas (incluindo islandMap, feito na Fase 9.3) — *2026-04-26*
+
+#### Resultado final
+
+- [x] **11.4** `npm run test` → **126/126 verde** (lógica intacta, só adições visuais e áudio) — *2026-04-26*
+- [x] **11.5** Verificação MCP completa em mobile (375x812): cerimônia de ilha, áudio sintético funcional via SpeechSynthesis API (silencioso em testes mas integrado), backup/restore JSON na Área dos Pais — *2026-04-26*
+
+### Fase 10 — Engajamento, pais e polish final (3 ondas)
+
+**Objetivo:** fechar 4 pendências de UX/closure: tutorial inicial, celebração de rank-up, Área dos Pais funcional, specs E2E alinhados.
+
+#### Onda 1 — Celebração de Rank-up
+
+- [x] **10.1** `showRankUpCelebration(rank)` em [public/js/renderers/feedback.js](public/js/renderers/feedback.js): overlay full-screen com card central (ícone gigante, nome do rank, "+X% em moedas"), 30 partículas de confete reusando `confettiDrop`, som `soundBigReward`. Wrapper `checkBadgesAndRankUp` em [public/js/engine.js](public/js/engine.js) compara `getRank` antes/depois — se mudou, dispara após delay (espera toasts de medalha primeiro). Aplicado nos 3 sites de `checkBadges` (memoryWin, onAnswer, showResult). CSS `@keyframes rankupZoom` + variantes coloridas por raridade (master violeta-glow, legend dourada com `legendaryPulse`) — *2026-04-26*
+
+#### Onda 2 — Tutorial inicial
+
+- [x] **10.2** Schema **v5** em [public/js/state.js](public/js/state.js): adiciona `hasSeenTutorial: false` e `parentsPin: null`. Migração v4→v5 lossless (defaults aplicados a saves antigos). Test `tests/unit/state.test.js` agora cobre v3→v4→v5 e v4→v5 lossless — *2026-04-26*
+- [x] **10.2** Componente novo [public/js/components/Tutorial.js](public/js/components/Tutorial.js) `startTutorial({ steps, onDone })`: overlay escuro, card central reposicionado por `step.target` (BoundingRect dinâmico), botão "Próximo"/"Bora jogar!" + "Pular". 4 steps definidos: bem-vindo + apontar Letras + explicar moedas + apontar Loja. Wire-up em [public/js/main.js](public/js/main.js) `showIslandMap` dispara apenas se `!state.hasSeenTutorial`, marca true ao concluir/pular — *2026-04-26*
+
+#### Onda 3 — Área dos Pais funcional
+
+- [x] **10.3** Novo renderer [public/js/renderers/parents.js](public/js/renderers/parents.js) com 3 modos: setup PIN (primeira vez, 4 dígitos), gate (pede PIN), dashboard. Dashboard tem: **6 stat cards** (fases completas N/75, medalhas N/total, moedas ganhas, sequência diária, melhor combo, rank atual), **5 barras de progresso por ilha** com cor temática + count N/15, **zona de cuidado** com botão Resetar progresso (confirmação dupla) + Mudar PIN. Helper `makePinInput` cria 4 caixas com auto-focus entre digitos e flash de erro — *2026-04-26*
+- [x] **10.3** Wire-up em `showParents` no main.js: chama `renderParents(state, onReset)` que recebe callback pra re-carregar state e voltar pro splash após reset — *2026-04-26*
+- [x] **10.3** CSS completo (parents-stats-grid 2-col, parents-island-bar com `--island-color`, parents-pin-digit 50x60, parents-danger zona vermelha) — *2026-04-26*
+- [x] **10.3** Verificação MCP: tela inicial pede PIN; após digitar e confirmar, mostra dashboard com stats reais (17/75 fases, 8/29 medalhas, 30000 moedas, sequência, combo, 🐤 Aventureiro) + 5 ilhas com barras coloridas — *2026-04-26*
+
+#### Onda 4 — Specs E2E atualizados
+
+- [x] **10.4** Reescritos 5 specs em [tests/e2e/](tests/e2e/) pra arquitetura atual: helpers usam `localStorage` direto pra setar `version: 5, hasSeenTutorial: true` (sem name prompt, sem tutorial overlay). Atualizados:
+  - `navigation.spec.js`: 12 tests cobrindo splash sem name prompt, 5 hotspots, missionsCard, main-nav, atividade com powerupBar, mascote visivel
+  - `island-map.spec.js`: 9 tests com 5 hotspots, ambient particles, hotspot rewards agora vai pra menu (Ilha do Tesouro), responsividade 375x812
+  - `new-phases.spec.js`: 6 tests com IDs reais (fase 9 sequência, 10 memória, 11 diferente, 16 conte) e gating cross-fase
+  - `math.spec.js`: 4 tests com fases 18 (Somas) e 19 (Subtrações) na ilha dos Numeros
+  - `phase-completion.spec.js`: 4 tests cobrindo completar fase 1, progress bar, powerup bar, streak counter — *2026-04-26*
+
+#### Resultado final
+
+- [x] **10.5** `npm run test` → **126/126 verde** (1 test novo de migração v5) — *2026-04-26*
+- [x] **10.6** Verificação MCP completa: tutorial dispara na primeira sessão e desaparece nas seguintes; rank-up celebra com confete; Área dos Pais com PIN funcional + dashboard real; powerups in-activity; missões diárias rotativas — *2026-04-26*
+
+### Fase 9 — Loja & Medalhas com propósito (3 ondas)
+
+**Objetivo:** Resolver 7 problemas profundos de motivação: temas invisíveis, mascote escondido, medalhas sem recompensa, critérios desatualizados, falta de variedade na loja, ausência de propósito.
+
+#### Onda 1 — Tornar tudo VISÍVEL
+
+- [x] **9.1** Refatorar `applyTheme` em [public/js/shop.js](public/js/shop.js) para usar CSS var `--theme-bg` + `data-theme-active` no `<html>` (em vez de `body.style.background` que era coberto pelos bgs das screens) — *2026-04-26*
+- [x] **9.2** [public/css/design-system.css](public/css/design-system.css): `.screen.active::before` agora aplica `var(--theme-bg)` com `mix-blend-mode: multiply` e `opacity: 0.55` quando tema ativo. Tema escolhido na loja vaza para TODAS as 8 screens — *2026-04-26*
+- [x] **9.3** Mascote sempre visível em [public/js/main.js](public/js/main.js): substituído `hideMascot()` por whitelist `SHOW_MASCOT = ['activity','celebration','splash','islandMap','menu','badges','shop','parents']`. CSS posicional por `body[data-screen]` em [public/css/styles.css](public/css/styles.css) — *2026-04-26*
+- [x] **9.4** Verificação preview MCP: tema "Espaço" aplicado visivelmente sobre splash + islandMap; mascote idle no canto inferior direito em todas as telas-âncora; 125/125 testes verde — *2026-04-26*
+
+#### Onda 2 — Medalhas com PROPÓSITO
+
+- [x] **9.5** Recompensa em moedas por raridade (Common 50, Rare 150, Epic 400, Legendary 1000) em [public/js/rewards.js](public/js/rewards.js) `BADGE_COIN_REWARD`. `checkBadges` credita as moedas via `addCoins` ao conquistar — *2026-04-26*
+- [x] **9.6** Critérios atualizados para 75 fases: `halfway` 6→15, `farroupilha` 9→30, `all-complete` 12→50, `educatche-mestre` 16→75. Novos `letters-master` (1-15), `numbers-master` (16-30), `colors-master` (31-45), `syllables-master` (46-60), `treasure-master` (61-75) usando helper `allPhasesIn()`. Math reescrito para "3 fases de math em 16-30" — *2026-04-26*
+- [x] **9.7** 5 medalhas novas: `island-explorer`, `fashionista`, `coin-spent-500`, `three-stars-10`, `treasure-master`. Tracking de `state.totalCoinsSpent` em `spendCoins`, `state.equippedHistory` em `equipItem` — *2026-04-26*
+- [x] **9.8** Itens premium da loja desbloqueiam por medalha (não só por moeda): `mascot-gold` requer `streak-10`, `mascot-rainbow` requer `three-stars-10`, `theme-galaxy` requer `all-complete`, `effect-fireworks` requer `perfect`, `effect-rainbow` requer `colors-master`, `effect-stars` requer `streak-5`. Novo suporte `requires.badge` em `meetsRequirements`. UI da loja mostra hint "🏆 Ganhe medalha X" quando bloqueado — *2026-04-26*
+- [x] **9.9** 5 testes unit atualizados (rewards.test.js + shop.test.js) para refletir critérios novos (15/50/75 fases, badge-based requires). 125/125 verde — *2026-04-26*
+
+#### Onda 3 — Loja com VARIEDADE de uso
+
+- [x] **9.10** Powerups (nova categoria `powerup` consumível): Dica 50, Tenta de Novo 75, 2x Moedas 200, Pular 150. `buyItem` suporta `consumable: true` (incrementa `state.powerups[id]`); novas funções `consumePowerup`/`powerupStock`. UI da loja mostra estoque (`x3` badge), descrição, botão "Comprar +1" — *2026-04-26*
+- [x] **9.11** **2x Moedas** funcional end-to-end: `engine.startActivity` consome 1 unidade do `powerup-2x` se houver e seta `state.coinMultiplier = 2`; `rewardForAnswer` aplica multiplicador antes de creditar e adiciona linha `"💰 2x Moedas"` no breakdown. Reseta no `showResult` — *2026-04-26*
+- [x] **9.12** Molduras (nova categoria `frame`): `frame-default` 0, `frame-gold` 250, `frame-neon` 350, `frame-holo` 500 (requires `three-stars-10`). [public/js/components/LevelCard.js](public/js/components/LevelCard.js) recebe prop `frame` e seta `data-frame` em fases completadas. CSS aplica halos: dourado, neon ciano, holo com `hue-rotate` — *2026-04-26*
+- [x] **9.13** UI da loja com 6 tabs: 💡 Powerups (default), 🐾 Mascotes, 🎨 Temas, 🎁 Acessórios, ✨ Efeitos, 🖼️ Molduras. CSS distintivo no preview por categoria — *2026-04-26*
+- [x] **9.14** Verificação preview MCP: tab Powerups mostra 4 cards (Dica, Tenta de Novo, 2x Moedas, Pular) com descrição, estoque badge verde (x3, x1), preço, "Comprar +1". Mascote ainda visível no canto. 125/125 testes verde — *2026-04-26*
+
+#### Onda 4 — Powerups in-activity, Missões diárias e Ranks
+
+- [x] **9.15** Powerup **Dica** funcional in-activity. Barra de powerups em [public/index.html](public/index.html) `#activity` com botão 💡 mostrando estoque. Click: consome 1, encontra `[data-correct="true"]` no `#activityContent` e aplica `.hint-pulse` (CSS `@keyframes hintPulse` + glow amarelo) por 3s. 8 renderers em [public/js/renderers/activities.js](public/js/renderers/activities.js) marcam o elemento correto: syllables, read-match, fill-blank, logical-sequence, odd-one-out, count-match, color-match, number-recognize, math-add/sub — *2026-04-26*
+- [x] **9.16** Powerup **Pular** funcional in-activity. Botão ⏭️ na barra de powerups. Click: consome 1, avança `roundIdx++` SEM mexer em `currentStreak`/`correctCount` (preserva combo) — *2026-04-26*
+- [x] **9.16** Powerup **Tenta de Novo** funcional. [public/js/renderers/feedback.js](public/js/renderers/feedback.js) `showFeedback` agora retorna `Promise<{retry?:boolean}>`. Se errou e há estoque, mostra botão `🔄 Tenta de Novo (-1)` no overlay. Click: consome 1, fecha overlay e retorna `{retry:true}`. [public/js/engine.js](public/js/engine.js) `ctx.showFeedback`/`ctx.onAnswer` interceptam: `session.retryRequested` força `renderRound()` na mesma rodada, sem perder streak. Funciona com TODOS os 16 renderers sem mudança — *2026-04-26*
+- [x] **9.17** Sistema de **Missões Diárias**. Novo [public/js/data/missions.js](public/js/data/missions.js) com pool de 14 missões (acertos, fases, combos, perfectos, moedas, por ilha). Novo [public/js/missions.js](public/js/missions.js) com `ensureDailyMissions` (sorteio determinístico via seed do dia), `getTodayMissions`, hooks (`onCorrectAnswer`, `onPhaseCompleted`, `onStreakReached`, `onCoinEarned`), `claimMission`. Card no `#islandMap` em [public/js/renderers/missions.js](public/js/renderers/missions.js) com 3 missões, barras de progresso, botão "+N moedas" ao completar. Engine chama os hooks em `onAnswer` e `showResult` — *2026-04-26*
+- [x] **9.18** Sistema de **Ranks**. `RANKS` em [public/js/rewards.js](public/js/rewards.js): 🐣 Pequeno (0+), 🐤 Aventureiro (5+ medalhas, +5%), 🦅 Mestre Pampa (12+, +10%), 🌟 Lenda do Sul (20+, +20%). `getRank(state)` retorna rank atual. `addCoins` aplica bônus % do rank antes de creditar. HUD ganha `.rank-pill` com ícone+nome+border colorida (Mestre violeta-glow, Lenda dourada com `legendaryPulse`). `renderHud` atualiza em tempo real — *2026-04-26*
+- [x] **9.19** Verificação preview MCP: HUD topo mostra `🐤 Aventureiro` + `999`; card "Missoes do dia (0/3)" no islandMap com 3 missões + barras + botão ⏳; barra de powerups in-activity (`💡 x3`, `⏭️ x2`); click no Dica caiu para 2 e ativou `.hint-pulse` no botão "4" (resposta correta). 125/125 testes verde — *2026-04-26*
+
+### Fase 8 — Polish visual: splash + header do mapa + hotspots alinhados
+
+**Objetivo:** Resolver 3 problemas visuais identificados pelo usuário ao ver o app no desktop. CSS-only, zero lógica.
+
+- [x] **8.1** Trocar gradient RS (vermelho/amarelo/verde) do `#splash` por azul-céu igual ao do `#islandMap` em [public/css/styles.css](public/css/styles.css). Atualizar também `#splash h1 text-shadow` e `#splash .subtitle background` para tons azuis — *2026-04-26*
+- [x] **8.2** `.map-logo` em [public/css/islands.css](public/css/islands.css): remover caixa branca extra e padding (a logo já tem fundo próprio); aumentar `max-height: clamp(80px, 14vh, 160px)` para crescer no desktop; adicionar `float 4s` infinite — *2026-04-26*
+- [x] **8.3** Reposicionar 5 hotspots em [public/css/islands.css:98-107](public/css/islands.css:98) para alinhar com as ilhas reais do JPG (medidas direto na imagem 1024x1024):
+  - `.island-letters`   38%/18% → **30%/18%** (sai da montanha nevada do meio, vai pra ilha do livro)
+  - `.island-numbers`   28%/80% → **22%/80%** (sobe pra ilha do "83")
+  - `.island-syllables` 12%/50% → **18%/47%** (mascote 🦜 cai sobre a ilha de letras-blocos)
+  - `.island-colors`    73%/26% → **76%/24%** (ajuste fino sobre a ilha do arco-íris)
+  - `.island-rewards`   76%/78% → **79%/78%** (centraliza sobre o baú)
+  - Atualizar `@media (max-width: 600px)` mobile com as mesmas coordenadas — *2026-04-26*
+- [x] **8.4** Verificação preview MCP em desktop 1280x800: 5 mascotes visivelmente alinhados sobre suas ilhas no JPG; logo do mapa maior e sem caixa duplicada; splash com `getComputedStyle.background` confirmado como gradient azul-céu (`rgb(174, 214, 241) → rgb(46, 134, 193)`, sem nenhum tom RS); 125/125 testes verde — *2026-04-26*
+
+### Fase 7 — Game Feel & Experiência (3 ondas)
+
+**Objetivo:** Tornar o app divertido e visualmente vivo. Foco exclusivo em UX/visual — zero alteração em lógica (engine, state, rounds, rewards, pools intactos). Todas as mudanças são aditivas (novas classes, novos keyframes).
+
+#### Onda 1 — Feedback imediato (acerto/erro/streak)
+
+- [x] **7.1** Keyframes `sparkleBurst`, `shakeX`, `streakHotPulse` em [public/css/styles.css](public/css/styles.css); regras `.sparkle-layer`/`.sparkle`, `.wrong-shake`, `body.streak-hot #activity`, `.streak-burst-layer` — *2026-04-26*
+- [x] **7.2** [public/js/renderers/feedback.js](public/js/renderers/feedback.js): `showFeedback` injeta 8 sparkles em ramo `correct`; nova função `showStreakBurst()` cria chuva de confete fixed sobre a viewport — *2026-04-26*
+- [x] **7.3** [public/js/engine.js](public/js/engine.js): toggle `body.streak-hot` quando `currentStreak >= 3`; dispara `showStreakBurst()` em streaks 3 e múltiplos de 5; cleanup em `startActivity` e `showResult` — *2026-04-26*
+- [x] **7.4** Substituído `wobble` por `shakeX` em `.letter-bubble.wrong`, `.option-btn.wrong`, `.image-option.wrong`, `.odd-item.wrong`, `.number-option-group.wrong`. `wobble` permanece no mascote — *2026-04-26*
+
+#### Onda 2 — Ilhas vivas e cor temática
+
+- [x] **7.5** [public/js/renderers/menu.js](public/js/renderers/menu.js) propaga `--island-color` no `menuRoot` (não só no header); [public/css/design-system.css](public/css/design-system.css) `#menu` ganha `radial-gradient` sutil com `color-mix(--island-color, white)` — *2026-04-26*
+- [x] **7.6** `.phase-card[data-state="available"]` ganha border + bg tematizados pela ilha; `availablePulse` usa `--island-color`; hover lift `translateY(-5px) scale(1.02)`. `[data-state="completed"]` também recebe bg sutil — *2026-04-26*
+- [x] **7.7** [public/index.html](public/index.html) ganha `<div class="map-ambient">` com 10 partículas (folhas, nuvens, sparkles, arco-íris, brilhos do tesouro); [public/css/islands.css](public/css/islands.css) novos keyframes `leafFall`, `cloudPass`, `citySparkle`, `rainbowFloat`, `treasureGlow` — *2026-04-26*
+- [x] **7.8** [public/js/renderers/islandMap.js](public/js/renderers/islandMap.js) recebe `state` e calcula completude por ilha (compara `state.completedPhases` com `island.phaseRange`); aplica classe `.island-complete` no botão. CSS `islandCompleteHalo` + estrela ⭐ via `::after` — *2026-04-26*
+
+#### Onda 3 — Vitrine e celebração (loja + medalhas)
+
+- [x] **7.9** [public/js/renderers/shop.js](public/js/renderers/shop.js) `renderCard` adiciona `card.dataset.category = item.category`; design-system.css aplica animação distinta por categoria (mascot=`float`, theme=`themeAnimatedPulse`, effect=`starPulse`, accessory=`bounce`) — *2026-04-26*
+- [x] **7.10** Novos keyframes `rarePulse`, `epicPulse` em [public/css/design-system.css](public/css/design-system.css). Aplicados em `.badge-card.earned.rarity-rare` e `.rarity-epic`. `legendary` mantém `legendaryPulse` (mais intenso) — *2026-04-26*
+- [x] **7.11** [public/js/renderers/feedback.js](public/js/renderers/feedback.js) `showBadgeNotification` reescrito com `createElement`+`textContent` (XSS-safe). Adiciona `.badge-particles` com 10 spans animados via `particleBurst`; cor da partícula muda por raridade (`data-rarity`) — *2026-04-26*
+
+#### Acessibilidade + verificação
+
+- [x] **7.12** Guard `@media (prefers-reduced-motion: reduce)` em [public/css/design-system.css](public/css/design-system.css) — todas animações reduzidas a 0.01ms — *2026-04-26*
+- [x] **7.13** `npm run test` 125/125 verde (lógica intacta) — *2026-04-26*
+- [x] **7.14** Verificação via preview MCP em 360x640, 375x812, 768x1024:
+  - splash + islandMap com 5 hotspots e ambient particles (folhas, nuvens, sparkles, arco-íris, brilho do tesouro)
+  - menu da ilha das Letras com fundo verde sutil + phase-card 1 com border verde
+  - 8 sparkles injetados no overlay quando correct (verificado via DOM eval)
+  - `body.streak-hot` aplica `streakHotPulse` no `#activity`
+  - shop tabs com animações distintas por categoria (mascot=float, theme=themeAnimatedPulse confirmados)
+  - badges paginadas: rare→`rarePulse`, epic→`epicPulse`, legendary→`legendaryPulse` (todos confirmados via getComputedStyle)
+  - badge notification com 10 partículas + classes XSS-safe
+  - hotspot da Letras (state.completedPhases=1..15) ganha `island-complete` + estrela no canto
+  - 0 erros / 0 warnings no console em todos os fluxos — *2026-04-26*
+- [ ] **7.15** Commit + push final — *aguardando confirmacao do usuario*
+
+### Fase 6 — Refactor "App Profissional Nivel 2" (4 ondas)
+
+**Objetivo:** Zero scroll vertical, 5 ilhas com identidade, 75 fases (5x15) com estrutura, sistema de estrelas (1-3), loja com tabs + grid 2 col, medalhas com raridade.
+
+#### Onda A — Responsividade + layout + UI
+
+- [x] **A.1** Tokens de espacamento (--space-1..8), tipografia clamp() (--fs-display/h2/body), `.screen { height: 100dvh; overflow: hidden; }` — *2026-04-25*
+- [x] **A.2** Splash centrado com clamp() — logo/mascotes responsam, max-height por viewport, sem comprimir — *2026-04-25*
+- [x] **A.3** Componente [public/js/components/Pager.js](public/js/components/Pager.js) — paginacao interna sem scroll — *2026-04-25*
+- [x] **A.4** Menu paginado por ilha (6 fases por pagina, header da ilha com cor + emoji + progresso ⭐ N/N) — *2026-04-25*
+- [x] **A.5** Medalhas paginadas (6 por pagina, summary 🏅 N/M no topo) — *2026-04-25*
+- [x] **A.6** `#activity .activity-content { flex: 1 1 auto; min-height: 0; overflow-y: auto; }` — scroll APENAS interno quando atividade exige (keyboard, etc) — *2026-04-25*
+- [x] **A.7** Auditoria 360x640 / 375x812 / 768x1024 — todas as 6 telas em altura exata, sem overflow horizontal — *2026-04-25*
+
+#### Onda B — Loja + Medalhas
+
+- [x] **B.1** Componente [public/js/components/Tabs.js](public/js/components/Tabs.js) — tablist generico com aria-current — *2026-04-25*
+- [x] **B.2** Loja: tabs no topo (🐾 Mascotes / 🎨 Temas / 🎁 Acessorios / ✨ Efeitos), grid 2 colunas paginado (4 cards por pagina), card grande com preview/preco/acao, selo Equipado, XSS-safe — *2026-04-25*
+- [x] **B.3** Medalhas com raridade (`common`/`rare`/`epic`/`legendary`) em [public/js/rewards.js](public/js/rewards.js); tabs por raridade na tela #badges; halos/ribbons distintos; lendarias com `legendaryPulse` — *2026-04-25*
+
+#### Onda C — Sistema de estrelas
+
+- [x] **C.1** Schema v4 em [public/js/state.js](public/js/state.js): `phaseStars: { phaseId: 0|1|2|3 }`. Migracao v3→v4 atribui 1⭐ a cada `completedPhase` existente — *2026-04-25*
+- [x] **C.2** [public/js/rewards.js](public/js/rewards.js): `starsForScore(percent)` (70/85/95), `updatePhaseStars` preserva o melhor; `rewardForPhaseEnd` aceita `percent` e retorna `stars` + bonus por estrela (+15 / +40); engine passa `percent` calculado — *2026-04-25*
+- [x] **C.3** [public/js/components/LevelCard.js](public/js/components/LevelCard.js) mostra 3 estrelas (acesas/apagadas) em pill no canto. Tela de result mostra estrelas grandes — *2026-04-25*
+- [x] **C.4** Tests: state v4 + migracao + rewards starsForScore + best stars preservadas — 125/125 verde — *2026-04-25*
+
+#### Onda D — Expansao para 75 fases (estrutura completa, conteudo iterativo)
+
+- [x] **D.1** [public/js/data/islands.js](public/js/data/islands.js) — 5 ilhas (forest/city/rainbow/clouds/treasure), `phaseRange`, helpers `islandForPhase` e `tierForPhase` — *2026-04-25*
+- [x] **D.2** [public/js/data/phases.js](public/js/data/phases.js) com 75 fases (1-15 Letras, 16-30 Numeros, 31-45 Cores, 46-60 Silabas, 61-75 Tesouro) — reaproveitam mecanicas existentes — *2026-04-25*
+- [x] **D.3** [public/js/rounds.js](public/js/rounds.js) mapeia `phase.type → pool` automaticamente; overrides para fases especiais (silabas BA/CA/MA por ilha, boss da ilha do tesouro) — *2026-04-25*
+- [x] **D.4** [public/js/renderers/menu.js](public/js/renderers/menu.js) usa `ISLANDS` para filtro/ranges; `islandMap.js` roteia hotspot rewards → Ilha do Tesouro (em vez de loja) — *2026-04-25*
+- [x] **D.5** Tests atualizados (75 fases) — 125/125 verde — *2026-04-25*
+
 ---
 
 ## 6. Pendências / pontos de atenção (não-bloqueantes)
@@ -151,7 +394,18 @@ Antes do primeiro `test:e2e`: `npx playwright install`.
 - Asset da logo está em [public/assets/brand/logo-mundo-tres-ilhas.jpg](public/assets/brand/logo-mundo-tres-ilhas.jpg) (renomeado durante a execução; index.html foi atualizado).
 - Texto do botão do splash continua "Bah, vamos comecar!" (não foi alterado para "Explorar as Ilhas!").
 - Ilha das Cores → menu filtrado mostrando apenas a fase 13 (default acordado).
+- **Fase 5 (Refactor UX/UI v2):** specs E2E ainda referenciam o name prompt removido — `tests/e2e/*.spec.js` precisam atualizar helpers (não bloqueia a app, só os specs E2E falhariam até serem atualizados).
+- 5ª ilha "Sons & Sílabas" usa balão 🎈 + emoji 🦜 (papagaio) como mascote — placeholder até asset real chegar.
+- **Fase 6 — conteúdo iterativo:** as 75 fases têm metadados completos, mas as 55 novas fases (16-75) reaproveitam pools existentes via `phase.type`. Pools dedicados por fase (palavras temáticas, sílabas tônicas, multiplicação, classificação por matiz) ficam para próxima onda.
+- **Fase 6 — desbloqueio cross-ilha:** atualmente fase N requer fase N-1. Fica pendente refinar gating para "5⭐ na ilha N para abrir ilha N+1" ou similar, conforme o uso real.
+- **Fase 6 — Ilha do Tesouro:** o hotspot 5️⃣ (rewards) agora roteia para o menu da ilha do Tesouro (fases 61-75), não mais para a loja. A loja continua acessível pela main-nav.
 
 ---
 
-**Última atualização:** 2026-04-24 — Mundo das Três Ilhas entregue: mapa, hotspots, mascotes, filtros do menu, testes e2e atualizados, verificação visual completa.
+**Última atualização:** 2026-04-25 — Fase 6 (4 ondas) entregue:
+  • **Onda A:** zero scroll vertical em 100dvh; Pager genérico; menu/medalhas/loja paginados; tokens de espaçamento e tipografia.
+  • **Onda B:** Tabs genérico; loja com 4 tabs + grid 2 col paginado + cards grandes; medalhas com raridade (common/rare/epic/legendary) em tabs.
+  • **Onda C:** schema v4 com `phaseStars`; engine calcula 1-3⭐ por fase via `percent`; LevelCard mostra estrelas; tela de result com estrelas animadas. Migração v3→v4 lossless.
+  • **Onda D:** 5 ilhas em [data/islands.js](public/js/data/islands.js); 75 fases (5×15) em [data/phases.js](public/js/data/phases.js); `rounds.js` mapeia `phase.type → pool` automaticamente. Hotspot "rewards" passa a abrir Ilha do Tesouro.
+  
+  **125/125 unit tests verdes.** Verificação via preview MCP em 360x640, 375x812, 768x1024 — todas as telas dimensionadas em altura exata, sem overflow horizontal.

@@ -162,14 +162,18 @@ describe('COUNT_MATCH_ROUNDS', () => {
 });
 
 describe('PHASES / phaseById', () => {
-    it('has 16 phases with unique ids 1..16', () => {
-        expect(PHASES).toHaveLength(16);
-        expect(PHASES.map((p) => p.id).sort((a, b) => a - b)).toEqual([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]);
+    it('has 75 phases with unique ids 1..75', () => {
+        expect(PHASES).toHaveLength(75);
+        const expected = Array.from({ length: 75 }, (_, i) => i + 1);
+        expect(PHASES.map((p) => p.id).sort((a, b) => a - b)).toEqual(expected);
     });
     it('phaseById returns the matching phase', () => {
         expect(phaseById(3).id).toBe(3);
-        expect(phaseById(13).type).toBe('color-match');
-        expect(phaseById(15).type).toBe('math-add');
+        // Apos refactor para 5 ilhas x 15 fases:
+        // - fase 13 esta na ilha das Letras (forest), tipo legado read-match
+        // - cores estao em 31-45
+        expect(phaseById(31).type).toBe('color-match');
+        expect(phaseById(18).type).toBe('math-add');
         expect(phaseById(999)).toBeUndefined();
     });
     it('every phase has a ROUNDS_PER_PHASE entry', () => {

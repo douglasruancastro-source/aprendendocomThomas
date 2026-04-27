@@ -10,7 +10,7 @@ export const SHOP_ITEMS = [
     { id: 'theme-ocean',    name: 'Oceano',    category: 'theme', icon: '\u{1F30A}', price: 200, bg: 'linear-gradient(180deg, #B3E5FC 0%, #0277BD 100%)', title: '#01579B' },
     { id: 'theme-desert',   name: 'Deserto',   category: 'theme', icon: '\u{1F3DC}\u{FE0F}',  price: 200, bg: 'linear-gradient(180deg, #FFF9C4 0%, #FFA726 100%)', title: '#E65100' },
     { id: 'theme-snow',     name: 'Neve',      category: 'theme', icon: '\u{2744}\u{FE0F}',   price: 200, bg: 'linear-gradient(180deg, #E1F5FE 0%, #81D4FA 100%)', title: '#01579B' },
-    { id: 'theme-galaxy',   name: 'Galaxia',   category: 'theme', icon: '\u{1F30C}', price: 1500, requires: { totalCoinsEarned: 2500 }, bg: 'linear-gradient(135deg, #6A1B9A 0%, #1A237E 50%, #000000 100%)', title: '#FFF9C4', animated: true },
+    { id: 'theme-galaxy',   name: 'Galaxia',   category: 'theme', icon: '\u{1F30C}', price: 1500, requires: { badge: 'all-complete' }, bg: 'linear-gradient(135deg, #6A1B9A 0%, #1A237E 50%, #000000 100%)', title: '#FFF9C4', animated: true },
     { id: 'theme-pampas',   name: 'Pampas',    category: 'theme', icon: '\u{1F40E}', price: 300, bg: 'linear-gradient(180deg, #FFF8E1 0%, #FFEB3B 50%, #A5D6A7 100%)', title: '#B71C1C' },
     { id: 'theme-bandeira', name: 'Tricolor',  category: 'theme', icon: '\u{1F3C1}', price: 400, bg: 'linear-gradient(180deg, #E53935 0%, #E53935 33%, #FFEB3B 33%, #FFEB3B 66%, #2E7D32 66%, #2E7D32 100%)', title: '#FFFFFF', animated: true },
     { id: 'theme-serra',    name: 'Serra',     category: 'theme', icon: '\u{1F3D4}\u{FE0F}', price: 350, bg: 'linear-gradient(180deg, #B3E5FC 0%, #81D4FA 40%, #2E7D32 100%)', title: '#01579B' },
@@ -22,8 +22,8 @@ export const SHOP_ITEMS = [
     { id: 'mascot-green',   name: 'Verde',     category: 'mascot', icon: '\u{1F7E2}', price: 100, color: '#66BB6A', stroke: '#2E7D32' },
     { id: 'mascot-purple',  name: 'Roxo',      category: 'mascot', icon: '\u{1F7E3}', price: 100, color: '#AB47BC', stroke: '#6A1B9A' },
     { id: 'mascot-pink',    name: 'Rosa',      category: 'mascot', icon: '\u{1F338}', price: 100, color: '#F48FB1', stroke: '#AD1457' },
-    { id: 'mascot-gold',    name: 'Dourado',   category: 'mascot', icon: '\u{1F31F}', price: 500, requires: { totalCoinsEarned: 1000 }, color: '#FFC107', stroke: '#FF6F00', sparkle: true },
-    { id: 'mascot-rainbow', name: 'Arco-iris', category: 'mascot', icon: '\u{1F308}', price: 800, requires: { completedPhases: 6 }, color: 'url(#rainbowGrad)', stroke: '#6A1B9A', rainbow: true },
+    { id: 'mascot-gold',    name: 'Dourado',   category: 'mascot', icon: '\u{1F31F}', price: 500, requires: { badge: 'streak-10' }, color: '#FFC107', stroke: '#FF6F00', sparkle: true },
+    { id: 'mascot-rainbow', name: 'Arco-iris', category: 'mascot', icon: '\u{1F308}', price: 800, requires: { badge: 'three-stars-10' }, color: 'url(#rainbowGrad)', stroke: '#6A1B9A', rainbow: true },
     { id: 'mascot-gaucho',  name: 'Gauchinho', category: 'mascot', icon: '\u{1F3C7}', price: 300, color: '#E53935', stroke: '#B71C1C' },
     { id: 'mascot-pampa',   name: 'Pampa',     category: 'mascot', icon: '\u{1F33F}', price: 300, color: '#66BB6A', stroke: '#1B5E20' },
 
@@ -40,9 +40,22 @@ export const SHOP_ITEMS = [
 
     // ===== Efeitos especiais =====
     { id: 'effect-default',  name: 'Confete',     category: 'effect', icon: '\u{1F389}', price: 0,   default: true },
-    { id: 'effect-fireworks', name: 'Fogos',      category: 'effect', icon: '\u{1F386}', price: 600, requires: { totalCoinsEarned: 500 } },
-    { id: 'effect-rainbow',  name: 'Arco-iris',  category: 'effect', icon: '\u{1F308}', price: 700, requires: { totalCoinsEarned: 800 } },
-    { id: 'effect-stars',    name: 'Chuva Estrelas', category: 'effect', icon: '\u{1F31F}', price: 700, requires: { totalCoinsEarned: 800 } },
+    { id: 'effect-fireworks', name: 'Fogos',      category: 'effect', icon: '\u{1F386}', price: 600, requires: { badge: 'perfect' } },
+    { id: 'effect-rainbow',  name: 'Arco-iris',  category: 'effect', icon: '\u{1F308}', price: 700, requires: { badge: 'colors-master' } },
+    { id: 'effect-stars',    name: 'Chuva Estrelas', category: 'effect', icon: '\u{1F31F}', price: 700, requires: { badge: 'streak-5' } },
+
+    // ===== Powerups (Fase 9 - Onda 3) — consumiveis usaveis durante atividade =====
+    // Diferente das outras categorias: nao se "equipa", se acumula no estoque e gasta na hora.
+    { id: 'powerup-hint',    name: 'Dica',         category: 'powerup', icon: '\u{1F4A1}', price: 50,  consumable: true, desc: 'Pisca a resposta certa por 1s' },
+    { id: 'powerup-retry',   name: 'Tenta de Novo', category: 'powerup', icon: '\u{1F504}', price: 75,  consumable: true, desc: 'Errou? Tenta a mesma rodada de novo' },
+    { id: 'powerup-2x',      name: '2x Moedas',    category: 'powerup', icon: '\u{1F4B0}', price: 200, consumable: true, desc: 'Proxima fase paga em dobro' },
+    { id: 'powerup-skip',    name: 'Pular',        category: 'powerup', icon: '\u{23ED}\u{FE0F}', price: 150, consumable: true, desc: 'Pula a rodada sem perder o streak' },
+
+    // ===== Molduras de fase (Fase 9 - Onda 3) — aparecem no phase-card completo do menu =====
+    { id: 'frame-default',  name: 'Sem Moldura',  category: 'frame', icon: '\u{1F5BC}\u{FE0F}', price: 0, default: true },
+    { id: 'frame-gold',     name: 'Dourada',      category: 'frame', icon: '\u{1F31F}', price: 250 },
+    { id: 'frame-neon',     name: 'Neon',         category: 'frame', icon: '\u{1F4A0}', price: 350 },
+    { id: 'frame-holo',     name: 'Holografica',  category: 'frame', icon: '\u{1F308}', price: 500, requires: { badge: 'three-stars-10' } },
 ];
 
 export function shopItemById(id) {

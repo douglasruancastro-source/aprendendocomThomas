@@ -69,3 +69,44 @@ export const SYLLABLE_ROUNDS = [
     { id: 's-que', syllable: 'QUE', options: ['QUE', 'QUI', 'GUE'], level: 2 },
     { id: 's-qui', syllable: 'QUI', options: ['QUI', 'QUE', 'GUI'], level: 2 },
 ];
+
+// ===== Sons & Silabas (fases 17-20) — junte 2 silabas pra formar palavra =====
+// Estrutura: { id, word: 'GATO', parts: ['GA','TO'], distractors: ['BO','PE',...], level }
+// O renderer mostra 2 slots, e o pool de opcoes contem parts + distractors embaralhados.
+// Phase split: 17 = palavras com B (level 1), 18 = com C, 19 = com M, 20 = mistas (level 2 incluido)
+
+export const SYLLABLE_BUILD_ROUNDS = [
+    // Fase 17 — letra B
+    { id: 'sb-bola', phase: 17, word: 'BOLA', parts: ['BO', 'LA'], distractors: ['BI', 'BU', 'TA', 'NA'], level: 1 },
+    { id: 'sb-boca', phase: 17, word: 'BOCA', parts: ['BO', 'CA'], distractors: ['BE', 'BI', 'CO', 'TA'], level: 1 },
+    { id: 'sb-bode', phase: 17, word: 'BODE', parts: ['BO', 'DE'], distractors: ['BA', 'BI', 'DA', 'TE'], level: 1 },
+    { id: 'sb-bebe', phase: 17, word: 'BEBE', parts: ['BE', 'BE'], distractors: ['BA', 'BI', 'DE', 'PE'], level: 1 },
+    { id: 'sb-bibi', phase: 17, word: 'BIBI', parts: ['BI', 'BI'], distractors: ['BA', 'BO', 'TI', 'NI'], level: 1 },
+    { id: 'sb-bota', phase: 17, word: 'BOTA', parts: ['BO', 'TA'], distractors: ['BE', 'BU', 'DA', 'NA'], level: 1 },
+
+    // Fase 18 — letra C
+    { id: 'sb-casa', phase: 18, word: 'CASA', parts: ['CA', 'SA'], distractors: ['CO', 'CU', 'NA', 'PA'], level: 1 },
+    { id: 'sb-copo', phase: 18, word: 'COPO', parts: ['CO', 'PO'], distractors: ['CA', 'CU', 'BO', 'TO'], level: 1 },
+    { id: 'sb-coco', phase: 18, word: 'COCO', parts: ['CO', 'CO'], distractors: ['CA', 'CU', 'BO', 'TO'], level: 1 },
+    { id: 'sb-cama', phase: 18, word: 'CAMA', parts: ['CA', 'MA'], distractors: ['CO', 'CI', 'NA', 'PA'], level: 1 },
+    { id: 'sb-cubo', phase: 18, word: 'CUBO', parts: ['CU', 'BO'], distractors: ['CA', 'CO', 'BI', 'PA'], level: 1 },
+    { id: 'sb-cola', phase: 18, word: 'COLA', parts: ['CO', 'LA'], distractors: ['CA', 'CU', 'BA', 'NA'], level: 1 },
+
+    // Fase 19 — letra M
+    { id: 'sb-mala', phase: 19, word: 'MALA', parts: ['MA', 'LA'], distractors: ['ME', 'MU', 'NA', 'TA'], level: 1 },
+    { id: 'sb-mola', phase: 19, word: 'MOLA', parts: ['MO', 'LA'], distractors: ['MA', 'MI', 'BA', 'NA'], level: 1 },
+    { id: 'sb-mato', phase: 19, word: 'MATO', parts: ['MA', 'TO'], distractors: ['MO', 'MU', 'BA', 'PA'], level: 1 },
+    { id: 'sb-meta', phase: 19, word: 'META', parts: ['ME', 'TA'], distractors: ['MA', 'MI', 'DA', 'PE'], level: 1 },
+    { id: 'sb-mimo', phase: 19, word: 'MIMO', parts: ['MI', 'MO'], distractors: ['MA', 'MU', 'BO', 'TO'], level: 1 },
+    { id: 'sb-mula', phase: 19, word: 'MULA', parts: ['MU', 'LA'], distractors: ['MA', 'MO', 'NA', 'PA'], level: 1 },
+
+    // Fase 20 — palavras mistas
+    { id: 'sb-gato', phase: 20, word: 'GATO', parts: ['GA', 'TO'], distractors: ['GO', 'GU', 'TA', 'PE'], level: 1 },
+    { id: 'sb-pato', phase: 20, word: 'PATO', parts: ['PA', 'TO'], distractors: ['PE', 'PI', 'TA', 'BO'], level: 1 },
+    { id: 'sb-rato', phase: 20, word: 'RATO', parts: ['RA', 'TO'], distractors: ['RE', 'RI', 'TA', 'PE'], level: 1 },
+    { id: 'sb-dado', phase: 20, word: 'DADO', parts: ['DA', 'DO'], distractors: ['DE', 'DI', 'BO', 'TO'], level: 1 },
+    { id: 'sb-vela', phase: 20, word: 'VELA', parts: ['VE', 'LA'], distractors: ['VI', 'VO', 'NA', 'TA'], level: 1 },
+    { id: 'sb-fada', phase: 20, word: 'FADA', parts: ['FA', 'DA'], distractors: ['FE', 'FI', 'TA', 'NA'], level: 1 },
+    { id: 'sb-jaca', phase: 20, word: 'JACA', parts: ['JA', 'CA'], distractors: ['JE', 'JU', 'CO', 'PA'], level: 2 },
+    { id: 'sb-luva', phase: 20, word: 'LUVA', parts: ['LU', 'VA'], distractors: ['LA', 'LE', 'BA', 'NA'], level: 2 },
+];

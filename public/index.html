@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EducaTche</title>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/design-system.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/islands.css">
     <link rel="preload" as="image" href="assets/maps/mapa-ilhas-home.jpg">
@@ -12,122 +13,32 @@
     <link rel="preload" as="image" href="assets/mascots/tomi-capivara.jpg">
     <link rel="preload" as="image" href="assets/mascots/ro-macaco.jpg">
     <link rel="preload" as="image" href="assets/mascots/livi-arara.jpg">
+    <link rel="preload" as="image" href="assets/mascots/mascotes-grupo.jpg">
     <script src="jspdf.umd.min.js"></script>
 </head>
 <body>
 
-<!-- HUD (moedas) -->
+<!-- HUD (moedas + rank) -->
 <div id="hud">
-    <span class="hud-icon">&#x1FA99;</span>
-    <span id="coinCount">0</span>
-</div>
-
-<!-- NAME PROMPT -->
-<div id="namePrompt" class="screen">
-    <div class="name-prompt-box">
-        <div class="name-prompt-mate">
-            <svg viewBox="0 0 100 120" aria-hidden="true">
-                <ellipse cx="50" cy="80" rx="28" ry="30" fill="#8D6E63" stroke="#4E342E" stroke-width="2"/>
-                <rect x="22" y="50" width="56" height="14" rx="4" fill="#FFD54F" stroke="#F57F17" stroke-width="2"/>
-                <rect x="30" y="38" width="40" height="14" rx="3" fill="#66BB6A" stroke="#2E7D32" stroke-width="2"/>
-                <rect x="60" y="20" width="6" height="60" fill="#BDBDBD" stroke="#616161" stroke-width="1.5"/>
-                <circle cx="63" cy="22" r="4" fill="#E0E0E0" stroke="#616161" stroke-width="1"/>
-            </svg>
-        </div>
-        <h1>Oi, guri ou guria!</h1>
-        <p class="name-prompt-sub">Qual e o seu nome?</p>
-        <input type="text" id="nameInput" maxlength="16" autocomplete="off" placeholder="Digite seu nome" />
-        <button class="btn btn-primary" id="nameConfirmBtn">Vamos jogar!</button>
+    <div id="rankPill" class="rank-pill" title="Seu rank">
+        <span id="rankIcon">&#x1F423;</span>
+        <span id="rankName">Pequeno</span>
+    </div>
+    <div class="coin-pill">
+        <span class="hud-icon">&#x1FA99;</span>
+        <span id="coinCount">0</span>
     </div>
 </div>
 
 <!-- SPLASH SCREEN -->
 <div id="splash" class="screen">
-    <div class="splash-logo" aria-hidden="true">
-        <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#FFF59D"/>
-                    <stop offset="60%" stop-color="#FFEB3B"/>
-                    <stop offset="100%" stop-color="#FBC02D"/>
-                </radialGradient>
-                <linearGradient id="grassGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#66BB6A"/>
-                    <stop offset="100%" stop-color="#2E7D32"/>
-                </linearGradient>
-                <linearGradient id="pageL" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#FFFDE7"/>
-                    <stop offset="100%" stop-color="#FFF59D"/>
-                </linearGradient>
-                <linearGradient id="pageR" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="#FFF59D"/>
-                    <stop offset="100%" stop-color="#FFFDE7"/>
-                </linearGradient>
-            </defs>
-
-            <!-- Halo do sol atras -->
-            <circle cx="110" cy="100" r="86" fill="url(#sunGlow)" opacity="0.55"/>
-
-            <!-- Terra (verde) -->
-            <path d="M20 170 Q110 140 200 170 L200 210 L20 210 Z" fill="url(#grassGrad)"/>
-
-            <!-- Pinheiro-do-parana silhueta (identidade RS) -->
-            <g transform="translate(34 92)">
-                <rect x="14" y="48" width="6" height="28" fill="#5D4037"/>
-                <path d="M17 8 L0 46 L34 46 Z" fill="#2E7D32" opacity="0.92"/>
-                <ellipse cx="17" cy="10" rx="18" ry="4" fill="#388E3C"/>
-                <ellipse cx="6" cy="18" rx="8" ry="2" fill="#388E3C"/>
-                <ellipse cx="28" cy="18" rx="8" ry="2" fill="#388E3C"/>
-            </g>
-
-            <!-- Livro aberto (centro) -->
-            <g transform="translate(46 88)">
-                <!-- sombra -->
-                <ellipse cx="64" cy="72" rx="62" ry="8" fill="#000" opacity="0.18"/>
-                <!-- paginas -->
-                <path d="M6 12 Q36 2 62 12 L62 66 Q36 58 6 66 Z" fill="url(#pageL)" stroke="#B71C1C" stroke-width="2.5" stroke-linejoin="round"/>
-                <path d="M122 12 Q92 2 66 12 L66 66 Q92 58 122 66 Z" fill="url(#pageR)" stroke="#2E7D32" stroke-width="2.5" stroke-linejoin="round"/>
-                <!-- lombada -->
-                <path d="M62 12 L62 66 L66 66 L66 12 Z" fill="#FFEB3B" stroke="#F57F17" stroke-width="1.5"/>
-                <!-- linhas de texto -->
-                <line x1="14" y1="22" x2="56" y2="20" stroke="#E53935" stroke-width="2" stroke-linecap="round"/>
-                <line x1="14" y1="30" x2="56" y2="28" stroke="#E53935" stroke-width="2" stroke-linecap="round"/>
-                <line x1="14" y1="38" x2="56" y2="36" stroke="#E53935" stroke-width="2" stroke-linecap="round"/>
-                <line x1="14" y1="46" x2="50" y2="44" stroke="#E53935" stroke-width="2" stroke-linecap="round"/>
-                <line x1="72" y1="20" x2="114" y2="22" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
-                <line x1="72" y1="28" x2="114" y2="30" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
-                <line x1="72" y1="36" x2="114" y2="38" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
-                <line x1="72" y1="44" x2="108" y2="46" stroke="#2E7D32" stroke-width="2" stroke-linecap="round"/>
-            </g>
-
-            <!-- Estrela brilhando saindo do livro -->
-            <g transform="translate(110 48)">
-                <polygon points="0,-24 6,-6 26,-6 10,6 16,26 0,14 -16,26 -10,6 -26,-6 -6,-6" fill="#FFEB3B" stroke="#F57F17" stroke-width="2.5" stroke-linejoin="round"/>
-                <circle cx="0" cy="-2" r="3" fill="#FFF" opacity="0.8"/>
-            </g>
-
-            <!-- Raios curtos da estrela -->
-            <g stroke="#FFC107" stroke-width="3" stroke-linecap="round" opacity="0.85">
-                <line x1="70" y1="28" x2="62" y2="20"/>
-                <line x1="150" y1="28" x2="158" y2="20"/>
-                <line x1="110" y1="8" x2="110" y2="0"/>
-            </g>
-
-            <!-- Cuia de chimarrao (lado direito, pequena) -->
-            <g transform="translate(156 136)">
-                <ellipse cx="18" cy="30" rx="18" ry="8" fill="#6D4C41" stroke="#3E2723" stroke-width="1.5"/>
-                <path d="M0 30 Q4 50 32 50 Q36 42 36 30 Z" fill="#8D6E63" stroke="#3E2723" stroke-width="1.5"/>
-                <line x1="22" y1="20" x2="30" y2="2" stroke="#BDBDBD" stroke-width="2.5" stroke-linecap="round"/>
-                <circle cx="31" cy="2" r="2" fill="#E0E0E0"/>
-                <ellipse cx="18" cy="24" rx="12" ry="3" fill="#2E7D32" opacity="0.75"/>
-            </g>
-        </svg>
+    <img src="assets/brand/logo-mundo-tres-ilhas.jpg" alt="Mundo das Tres Ilhas" class="splash-brand">
+    <img src="assets/mascots/mascotes-grupo.jpg" alt="Tomi, Ro e Livi" class="splash-mascots">
+    <div class="subtitle" id="splashSubtitle">Oi guri! Vamos aprender brincando?</div>
+    <div class="splash-actions">
+        <button class="btn-primary" id="startBtn">Comecar</button>
+        <button class="btn-secondary" id="parentsBtn">Area dos pais</button>
     </div>
-    <h1 id="splashTitle">EducaTche</h1>
-    <div class="subtitle" id="splashSubtitle">Vamos aprender a ler e escrever!</div>
-    <button class="btn btn-primary" id="startBtn" style="margin-top:20px; font-size:34px;">
-        Bah, vamos comecar!
-    </button>
 </div>
 
 <!-- ISLAND MAP SCREEN -->
@@ -137,6 +48,19 @@
     </header>
     <div class="map-canvas">
         <img src="assets/maps/mapa-ilhas-home.jpg" alt="" class="map-bg">
+        <!-- Fase 7: ambiente animado por ilha (sem pointer events, decorativo) -->
+        <div class="map-ambient" aria-hidden="true">
+            <span class="ambient-particle leaf l1">&#x1F343;</span>
+            <span class="ambient-particle leaf l2">&#x1F343;</span>
+            <span class="ambient-particle leaf l3">&#x1F33F;</span>
+            <span class="ambient-particle cloud c1">&#x2601;&#xFE0F;</span>
+            <span class="ambient-particle cloud c2">&#x2601;&#xFE0F;</span>
+            <span class="ambient-particle sparkle-city s1">&#x2728;</span>
+            <span class="ambient-particle sparkle-city s2">&#x2728;</span>
+            <span class="ambient-particle rainbow-bit r1">&#x1F308;</span>
+            <span class="ambient-particle treasure-glow t1">&#x2728;</span>
+            <span class="ambient-particle treasure-glow t2">&#x1F4AB;</span>
+        </div>
         <button class="island-hotspot island-letters" data-section="letters" type="button" aria-label="Ilha das Letras com Tomi">
             <img src="assets/mascots/tomi-capivara.jpg" alt="" class="island-mascot">
             <span class="island-label">Letras</span>
@@ -149,27 +73,48 @@
             <img src="assets/mascots/livi-arara.jpg" alt="" class="island-mascot">
             <span class="island-label">Cores</span>
         </button>
-        <button class="island-hotspot island-rewards" data-section="rewards" type="button" aria-label="Ilha do Bau de Recompensas">
-            <span class="island-emoji" aria-hidden="true">&#x1F381;</span>
-            <span class="island-label">Recompensas</span>
+        <button class="island-hotspot island-rewards" data-section="rewards" type="button" aria-label="Ilha do Tesouro">
+            <span class="island-emoji" aria-hidden="true">&#x1F48E;</span>
+            <span class="island-label">Tesouro</span>
+        </button>
+        <button class="island-hotspot island-syllables" data-section="syllables" type="button" aria-label="Balao das Silabas">
+            <span class="island-emoji island-balloon" aria-hidden="true">&#x1F388;</span>
+            <span class="island-mascot-emoji" aria-hidden="true">&#x1F99C;</span>
+            <span class="island-label">Silabas</span>
         </button>
     </div>
 </div>
 
 <!-- MENU SCREEN -->
 <div id="menu" class="screen">
+    <button class="btn-back" id="menuBackBtn">&larr; Voltar</button>
     <h2 id="menuTitle">Escolha uma fase!</h2>
     <div class="stars-bar" id="starsBar"></div>
-    <button class="btn menu-shop-btn" id="shopBtn">&#x1F6D2; Loja</button>
     <div class="section-label" data-section="alfa">Alfabetizacao</div>
     <div class="phases-grid" id="phasesGrid"></div>
     <div class="section-label" data-section="logic">Raciocinio Logico</div>
     <div class="phases-grid" id="phasesGridLogic"></div>
     <div class="section-label" data-section="math">Matematica</div>
     <div class="phases-grid" id="phasesGridMath"></div>
-    <div class="badges-section">
-        <h3>Minhas Medalhas</h3>
-        <div class="badges-grid" id="badgesGrid"></div>
+    <div class="section-label" data-section="syllables">Sons &amp; Silabas</div>
+    <div class="phases-grid" id="phasesGridSyllables"></div>
+</div>
+
+<!-- BADGES SCREEN -->
+<div id="badges" class="screen">
+    <button class="btn-back" id="badgesBackBtn">&larr; Voltar</button>
+    <h2 class="screen-title">Minhas Medalhas</h2>
+    <div class="badges-grid-large" id="badgesGridLarge"></div>
+</div>
+
+<!-- PARENTS SCREEN -->
+<div id="parents" class="screen">
+    <button class="btn-back" id="parentsBackBtn">&larr; Voltar</button>
+    <h2 class="screen-title">Area dos pais</h2>
+    <div class="parents-card">
+        <div class="parents-emoji" aria-hidden="true">&#x1F512;</div>
+        <h3>Em breve!</h3>
+        <p>Aqui voce vai poder acompanhar o progresso do seu pequeno e configurar opcoes do app, com PIN para proteger.</p>
     </div>
 </div>
 
@@ -183,15 +128,26 @@
         <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
         <div class="streak-display" id="streakDisplay">&#x1F525; <span id="streakCount">0</span></div>
     </div>
+    <!-- Fase 9.15/9.16: barra de powerups (so visivel em #activity) -->
+    <div class="powerup-bar" id="powerupBar" aria-label="Seus powerups">
+        <button class="powerup-btn" data-powerup="powerup-hint" type="button">
+            <span class="pw-icon">&#x1F4A1;</span>
+            <span class="pw-stock" data-stock="0">0</span>
+        </button>
+        <button class="powerup-btn" data-powerup="powerup-skip" type="button">
+            <span class="pw-icon">&#x23ED;&#xFE0F;</span>
+            <span class="pw-stock" data-stock="0">0</span>
+        </button>
+    </div>
     <div class="instruction" id="instruction"></div>
     <div class="activity-content" id="activityContent"></div>
 </div>
 
 <!-- SHOP SCREEN -->
 <div id="shop" class="screen">
-    <h2 id="shopTitle">Loja do Tche</h2>
+    <h2 id="shopTitle" style="display:none;">Loja</h2>
     <div id="shopContent"></div>
-    <button class="btn btn-primary" id="shopBackBtn" style="font-size:22px;">Voltar ao Menu</button>
+    <button class="btn-secondary" id="shopBackBtn">← Voltar</button>
 </div>
 
 <!-- RESULT SCREEN -->
@@ -223,8 +179,15 @@
     </div>
 </div>
 
-<!-- HOME BUTTON -->
+<!-- HOME BUTTON (visivel so dentro da atividade/result) -->
 <button class="btn btn-home" id="homeBtn" style="display:none;">Casa</button>
+
+<!-- MAIN NAV (Jogar / Medalhas / Loja) -->
+<nav class="main-nav" id="mainNav" aria-label="Menu principal">
+    <button data-nav="play" type="button">&#x1F3AE; Jogar</button>
+    <button data-nav="badges" type="button">&#x1F3C5; Medalhas</button>
+    <button data-nav="shop" type="button">&#x1F6D2; Loja</button>
+</nav>
 
 <!-- MASCOT -->
 <div id="mascot">

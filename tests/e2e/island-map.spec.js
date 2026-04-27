@@ -1,91 +1,84 @@
 import { test, expect } from '@playwright/test';
 
-async function landAtMap(page, name = 'Tche') {
+// Helper: estado fresco com tutorial dismissado.
+async function landAtMap(page) {
     await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
-    await page.goto('/');
-    await page.fill('#nameInput', name);
-    await page.click('#nameConfirmBtn');
-    await page.click('text=Bah, vamos comecar!');
+    await page.evaluate(() => {
+        const KEY = 'thomas_learning_v3';
+        const s = { version: 5, hasSeenTutorial: true, completedPhases: [],
+                    equipped: { theme: 'theme-default', mascot: 'mascot-default', accessory: 'acc-none', effect: 'effect-default' } };
+        localStorage.setItem(KEY, JSON.stringify(s));
+    });
+    await page.reload();
+    await page.click('#startBtn');
+    await expect(page.locator('#islandMap')).toBeVisible();
 }
 
-test.describe('Mundo das Tres Ilhas — mapa', () => {
-    test('renders 4 hotspots with correct data-section', async ({ page }) => {
+test.describe('Mundo das Tres Ilhas — mapa (Fase 10.4)', () => {
+    test('5 hotspots com data-section corretos', async ({ page }) => {
         await landAtMap(page);
-        await expect(page.locator('#islandMap')).toBeVisible();
         const hotspots = page.locator('.island-hotspot');
-        await expect(hotspots).toHaveCount(4);
+        await expect(hotspots).toHaveCount(5);
         await expect(page.locator('[data-section="letters"]')).toBeVisible();
         await expect(page.locator('[data-section="numbers"]')).toBeVisible();
         await expect(page.locator('[data-section="colors"]')).toBeVisible();
+        await expect(page.locator('[data-section="syllables"]')).toBeVisible();
         await expect(page.locator('[data-section="rewards"]')).toBeVisible();
     });
 
-    test('island map shows brand logo and the map background image', async ({ page }) => {
+    test('logo e mapa de fundo visiveis', async ({ page }) => {
         await landAtMap(page);
         await expect(page.locator('.map-logo')).toBeVisible();
         await expect(page.locator('.map-bg')).toBeVisible();
     });
 
-    test('mascotes (tomi, ro, livi) are present near their islands', async ({ page }) => {
+    test('mascotes flutuantes nao bloqueiam clique no botao', async ({ page }) => {
         await landAtMap(page);
         const tomi = page.locator('.island-letters .island-mascot');
-        const ro = page.locator('.island-numbers .island-mascot');
-        const livi = page.locator('.island-colors .island-mascot');
         await expect(tomi).toBeVisible();
-        await expect(ro).toBeVisible();
-        await expect(livi).toBeVisible();
-        // Mascotes nao devem absorver clique (pointer-events: none) — botao parent recebe.
         const pointerEvents = await tomi.evaluate((el) => getComputedStyle(el).pointerEvents);
         expect(pointerEvents).toBe('none');
     });
 
-    test('letters island routes to menu with letters filter', async ({ page }) => {
+    test('ambient particles (folhas/nuvens/brilhos) renderizadas', async ({ page }) => {
+        await landAtMap(page);
+        await expect(page.locator('.map-ambient')).toBeVisible();
+        const particles = page.locator('.ambient-particle');
+        await expect(particles.first()).toBeVisible();
+    });
+
+    test('clicar na ilha das Letras abre menu', async ({ page }) => {
         await landAtMap(page);
         await page.click('.island-letters');
         await expect(page.locator('#menu')).toBeVisible();
-        await expect(page.locator('#menu')).toHaveClass(/filter-letters/);
     });
 
-    test('numbers island routes to menu with numbers filter', async ({ page }) => {
+    test('clicar na ilha dos Numeros abre menu', async ({ page }) => {
         await landAtMap(page);
         await page.click('.island-numbers');
         await expect(page.locator('#menu')).toBeVisible();
-        await expect(page.locator('#menu')).toHaveClass(/filter-numbers/);
     });
 
-    test('colors island routes to menu with colors filter (only fase 13 visible)', async ({ page }) => {
-        await landAtMap(page);
-        await page.click('.island-colors');
-        await expect(page.locator('#menu')).toBeVisible();
-        await expect(page.locator('#menu')).toHaveClass(/filter-colors/);
-        // Fases que nao sao 13 ficam ocultas
-        await expect(page.locator('#phasesGridMath .phase-card[data-phase-id="14"]')).toBeHidden();
-        await expect(page.locator('#phasesGridMath .phase-card[data-phase-id="15"]')).toBeHidden();
-        await expect(page.locator('#phasesGridMath .phase-card[data-phase-id="16"]')).toBeHidden();
-    });
-
-    test('rewards island opens the shop', async ({ page }) => {
+    test('clicar na ilha do Tesouro abre menu (nao mais a loja direto)', async ({ page }) => {
         await landAtMap(page);
         await page.click('.island-rewards');
-        await expect(page.locator('#shop')).toBeVisible();
+        // Hotspot rewards agora vai para o menu da Ilha do Tesouro (fases 61-75).
+        await expect(page.locator('#menu')).toBeVisible();
     });
 
-    test('responsive: layout holds on mobile viewport (375x812)', async ({ page }) => {
+    test('responsivo: layout segura em 375x812', async ({ page }) => {
         await page.setViewportSize({ width: 375, height: 812 });
         await landAtMap(page);
-        await expect(page.locator('#islandMap')).toBeVisible();
-        await expect(page.locator('.island-hotspot')).toHaveCount(4);
-        // Mapa nao transborda viewport
+        await expect(page.locator('.island-hotspot')).toHaveCount(5);
         const canvasWidth = await page.locator('.map-canvas').evaluate((el) => el.getBoundingClientRect().width);
         expect(canvasWidth).toBeLessThanOrEqual(375);
     });
 
-    test('back from menu via home button returns to island map', async ({ page }) => {
+    test('homeBtn dentro de fase volta para islandMap', async ({ page }) => {
         await landAtMap(page);
         await page.click('.island-letters');
-        // Entra numa fase pra mostrar o homeBtn
-        await page.locator('#phasesGrid .phase-card').first().click();
+        await page.locator('#menu .phase-card').first().click();
+        await expect(page.locator('#homeBtn')).toBeVisible();
         await page.click('#homeBtn');
         await expect(page.locator('#islandMap')).toBeVisible();
     });

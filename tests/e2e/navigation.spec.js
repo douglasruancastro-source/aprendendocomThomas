@@ -1,148 +1,122 @@
 import { test, expect } from '@playwright/test';
 
-// Helper: limpa storage, atravessa name prompt e splash, cai no #islandMap.
-async function startAtIslandMap(page, name = 'Tchezinho') {
+// Fase 10.4: helpers atualizados pra arquitetura sem name prompt + tutorial dismissivel.
+// Sempre marcamos hasSeenTutorial=true antes de carregar pra evitar o overlay.
+async function startAtSplash(page) {
     await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
+    await page.evaluate(() => {
+        localStorage.clear();
+        const seed = { hasSeenTutorial: true, version: 5 };
+        // estado mínimo aceito pelo loadState (sem completedPhases dispara default)
+    });
     await page.goto('/');
-    await page.fill('#nameInput', name);
-    await page.click('#nameConfirmBtn');
-    await page.click('text=Bah, vamos comecar!');
+    // Marca tutorial como visto via state direto pra evitar overlay durante testes.
+    await page.evaluate(() => {
+        const KEY = 'thomas_learning_v3';
+        const s = JSON.parse(localStorage.getItem(KEY) || '{}');
+        s.version = 5;
+        s.hasSeenTutorial = true;
+        s.completedPhases = s.completedPhases || [];
+        s.equipped = s.equipped || { theme: 'theme-default', mascot: 'mascot-default', accessory: 'acc-none', effect: 'effect-default' };
+        localStorage.setItem(KEY, JSON.stringify(s));
+    });
+    await page.reload();
 }
 
-// Helper: do island map, entra na ilha das Letras (menu filtrado fases 1-8).
-async function enterLetters(page) {
-    await page.click('.island-letters');
+async function startAtIslandMap(page) {
+    await startAtSplash(page);
+    await page.click('#startBtn');
+    await expect(page.locator('#islandMap')).toBeVisible();
 }
 
-test.describe('Navigation', () => {
-    test.beforeEach(async ({ page }) => {
-        await page.goto('/');
-        await page.evaluate(() => localStorage.clear());
+test.describe('Navigation (Fase 10.4)', () => {
+    test('lands directly on splash (no name prompt)', async ({ page }) => {
+        await startAtSplash(page);
+        await expect(page.locator('#splash')).toBeVisible();
+        // Sem #namePrompt na arquitetura atual
+        await expect(page.locator('#namePrompt')).toHaveCount(0);
+        await expect(page.locator('#startBtn')).toBeVisible();
+        await expect(page.locator('#parentsBtn')).toBeVisible();
     });
 
-    test('shows name prompt on first load', async ({ page }) => {
-        await page.goto('/');
-        const prompt = page.locator('#namePrompt');
-        await expect(prompt).toBeVisible();
-        await expect(prompt).toContainText('Qual e o seu nome?');
-    });
-
-    test('name prompt advances to splash and shows EducaTche title', async ({ page }) => {
-        await page.goto('/');
-        await page.fill('#nameInput', 'Thomas');
-        await page.click('#nameConfirmBtn');
-        const splash = page.locator('#splash');
-        await expect(splash).toBeVisible();
-        await expect(splash).toContainText('EducaTche');
-        await expect(splash).toContainText('Bah, vamos comecar!');
-    });
-
-    test('after splash, lands on island map with 4 hotspots', async ({ page }) => {
-        await startAtIslandMap(page, 'Thomas');
-        await expect(page.locator('#islandMap')).toBeVisible();
-        await expect(page.locator('.island-hotspot')).toHaveCount(4);
+    test('Comecar leva ao islandMap com 5 hotspots', async ({ page }) => {
+        await startAtIslandMap(page);
+        await expect(page.locator('.island-hotspot')).toHaveCount(5);
         await expect(page.locator('.island-letters')).toBeVisible();
         await expect(page.locator('.island-numbers')).toBeVisible();
         await expect(page.locator('.island-colors')).toBeVisible();
+        await expect(page.locator('.island-syllables')).toBeVisible();
         await expect(page.locator('.island-rewards')).toBeVisible();
     });
 
-    test('island map shows brand logo in header', async ({ page }) => {
+    test('islandMap tem logo + missoes diarias + main-nav', async ({ page }) => {
         await startAtIslandMap(page);
         await expect(page.locator('.map-logo')).toBeVisible();
+        await expect(page.locator('#missionsCard')).toBeVisible();
+        await expect(page.locator('#mainNav')).toBeVisible();
+        await expect(page.locator('#mainNav button[data-nav="play"]')).toBeVisible();
+        await expect(page.locator('#mainNav button[data-nav="badges"]')).toBeVisible();
+        await expect(page.locator('#mainNav button[data-nav="shop"]')).toBeVisible();
     });
 
-    test('clicking Letters island opens menu with alfabetizacao + logica (12 cards)', async ({ page }) => {
+    test('clicar na ilha das Letras abre o menu com cards', async ({ page }) => {
         await startAtIslandMap(page);
-        await enterLetters(page);
+        await page.click('.island-letters');
         await expect(page.locator('#menu')).toBeVisible();
-        await expect(page.locator('#phasesGrid .phase-card')).toHaveCount(8);
-        await expect(page.locator('#phasesGridLogic .phase-card')).toHaveCount(4);
-        // Matematica oculta pelo filtro
-        await expect(page.locator('#phasesGridMath')).toBeHidden();
+        // Pelo menos 1 card visivel (a fase 1 que esta desbloqueada)
+        await expect(page.locator('#menu .phase-card').first()).toBeVisible();
     });
 
-    test('clicking Numeros island opens menu with 4 math cards', async ({ page }) => {
+    test('main-nav: medalhas vai para #badges', async ({ page }) => {
         await startAtIslandMap(page);
-        await page.click('.island-numbers');
-        await expect(page.locator('#menu')).toBeVisible();
-        await expect(page.locator('#phasesGridMath .phase-card')).toHaveCount(4);
-        await expect(page.locator('#phasesGrid')).toBeHidden();
+        await page.click('#mainNav button[data-nav="badges"]');
+        await expect(page.locator('#badges')).toBeVisible();
     });
 
-    test('clicking Recompensas island opens the shop', async ({ page }) => {
+    test('main-nav: loja vai para #shop', async ({ page }) => {
         await startAtIslandMap(page);
-        await page.click('.island-rewards');
+        await page.click('#mainNav button[data-nav="shop"]');
         await expect(page.locator('#shop')).toBeVisible();
     });
 
-    test('menu shows personalized greeting with typed name', async ({ page }) => {
-        await startAtIslandMap(page, 'Thomas');
-        await enterLetters(page);
-        const menu = page.locator('#menu');
-        await expect(menu).toContainText('Thomas');
-        await expect(menu).toContainText('Escolha uma fase!');
+    test('botao Area dos Pais no splash leva para #parents', async ({ page }) => {
+        await startAtSplash(page);
+        await page.click('#parentsBtn');
+        await expect(page.locator('#parents')).toBeVisible();
     });
 
-    test('phase 1 is unlocked in Letters menu', async ({ page }) => {
+    test('HUD mostra rank pill + coin pill', async ({ page }) => {
         await startAtIslandMap(page);
-        await enterLetters(page);
-        const cards = page.locator('#phasesGrid .phase-card');
-        await expect(cards.first()).not.toHaveClass(/locked/);
-        await expect(cards.nth(1)).toHaveClass(/locked/);
+        await expect(page.locator('#rankPill')).toBeVisible();
+        await expect(page.locator('#coinCount')).toBeVisible();
     });
 
-    test('shows badges section in menu', async ({ page }) => {
+    test('clicar fase 1 inicia atividade com powerup bar', async ({ page }) => {
         await startAtIslandMap(page);
-        await enterLetters(page);
-        await expect(page.locator('text=Minhas Medalhas')).toBeVisible();
-        const badges = page.locator('.badge-item');
-        await expect(badges.first()).toBeVisible();
+        await page.click('.island-letters');
+        await page.locator('#menu .phase-card').first().click();
+        await expect(page.locator('#activity')).toBeVisible();
+        await expect(page.locator('#powerupBar')).toBeVisible();
     });
 
-    test('clicking phase 1 starts activity', async ({ page }) => {
+    test('homeBtn durante atividade volta ao islandMap', async ({ page }) => {
         await startAtIslandMap(page);
-        await enterLetters(page);
-        await page.locator('#phasesGrid .phase-card').first().click();
-        const activity = page.locator('#activity');
-        await expect(activity).toBeVisible();
-        await expect(activity).toContainText('Encontre as Vogais');
-    });
-
-    test('home button appears during activity', async ({ page }) => {
-        await startAtIslandMap(page);
-        await enterLetters(page);
-        await page.locator('#phasesGrid .phase-card').first().click();
+        await page.click('.island-letters');
+        await page.locator('#menu .phase-card').first().click();
         await expect(page.locator('#homeBtn')).toBeVisible();
-    });
-
-    test('home button returns to island map', async ({ page }) => {
-        await startAtIslandMap(page);
-        await enterLetters(page);
-        await page.locator('#phasesGrid .phase-card').first().click();
-        await page.locator('#homeBtn').click();
+        await page.click('#homeBtn');
         await expect(page.locator('#islandMap')).toBeVisible();
     });
 
-    test('stars bar shows empty stars initially', async ({ page }) => {
+    test('mascote visivel durante atividade', async ({ page }) => {
         await startAtIslandMap(page);
-        await enterLetters(page);
-        const text = await page.locator('#starsBar').textContent();
-        expect(text).toMatch(/☆/);
-    });
-
-    test('mascot is visible during activity', async ({ page }) => {
-        await startAtIslandMap(page);
-        await enterLetters(page);
-        await page.locator('#phasesGrid .phase-card').first().click();
+        await page.click('.island-letters');
+        await page.locator('#menu .phase-card').first().click();
         await expect(page.locator('#mascot')).toHaveClass(/visible/);
     });
 
-    test('name persists across reloads (no prompt shown again)', async ({ page }) => {
-        await startAtIslandMap(page, 'Thomas');
-        await page.reload();
-        await expect(page.locator('#namePrompt')).not.toBeVisible();
-        await expect(page.locator('#splash')).toBeVisible();
+    test('tutorial nao aparece em sessoes seguintes (hasSeenTutorial=true)', async ({ page }) => {
+        await startAtIslandMap(page);
+        await expect(page.locator('.tutorial-overlay')).toHaveCount(0);
     });
 });

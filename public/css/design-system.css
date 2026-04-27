@@ -1,0 +1,1497 @@
+/* Design system EducaTche — tokens e componentes globais.
+   Importado ANTES de styles.css. Concentra paleta amigavel infantil
+   (sem vermelho agressivo), tap targets >= 48px, raios e sombras suaves. */
+
+:root {
+    /* Paleta infantil */
+    --color-primary:   #FFD54F;
+    --color-primary-dark: #FFA000;
+    --color-secondary: #66BB6A;
+    --color-accent:    #FF8A65;
+    --color-info:      #4FC3F7;
+    --color-warning:   #FFB74D;
+    --color-bg-1:      #FFF8E1;
+    --color-bg-2:      #FFE0B2;
+    --color-text:      #3E2723;
+    --color-locked:    #BDBDBD;
+    --color-success:   #43A047;
+
+    /* Gradientes leves */
+    --gradient-soft:   linear-gradient(180deg, var(--color-bg-1) 0%, var(--color-bg-2) 100%);
+    --gradient-sky:    linear-gradient(180deg, #AED6F1 0%, #5DADE2 60%, #2E86C1 100%);
+    --gradient-sunset: linear-gradient(135deg, #FFD54F 0%, #FF8A65 100%);
+
+    /* Sombras suaves */
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.10);
+    --shadow-md: 0 6px 18px rgba(31, 45, 61, 0.14);
+    --shadow-lg: 0 12px 28px rgba(31, 45, 61, 0.20);
+
+    /* Raios infantis (generosos) */
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 28px;
+    --radius-pill: 999px;
+
+    /* Tipografia */
+    --fs-xs: 14px;
+    --fs-sm: 16px;
+    --fs-md: 20px;
+    --fs-lg: 28px;
+    --fs-xl: 40px;
+
+    /* Tap targets — minimo 48px */
+    --tap-min: 48px;
+
+    /* Z-index */
+    --z-nav: 50;
+    --z-hud: 60;
+    --z-overlay: 100;
+
+    /* Espacamentos */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+
+    /* Hierarquia tipografica */
+    --fs-display: clamp(28px, 6vw, 56px);
+    --fs-h2:      clamp(20px, 4vw, 32px);
+    --fs-body:    clamp(14px, 2.5vw, 18px);
+}
+
+/* ===== Layout fullscreen sem scroll ===== */
+html, body { height: 100%; }
+
+/* Telas tem altura fixa = viewport. Conteudo pagina internamente. */
+.screen {
+    /* Sobrescreve min-height do styles.css */
+    min-height: 0 !important;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-3);
+    position: relative; /* para overlay de tema */
+}
+
+/* Fase 9 - Onda 1: tema comprado vaza para todas as screens via overlay sobreposto.
+   O bg original de cada screen continua intacto; tema fica numa camada por cima
+   semi-transparente, deixando o "espirito" da tela mas marcando o tema escolhido. */
+.screen.active::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--theme-bg, transparent);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity 0.4s ease;
+    mix-blend-mode: multiply;
+}
+:root[data-theme-active="1"] .screen.active::before { opacity: 0.55; }
+
+/* Garante que o conteudo da screen fica acima do overlay */
+.screen.active > * { position: relative; z-index: 1; }
+
+/* Quando main-nav esta visivel reservar espaco no rodape */
+body.has-main-nav .screen.active {
+    padding-bottom: 88px;
+}
+
+/* Wrapper de scroll INTERNO se realmente precisar (atividades especificas) */
+.screen-scroll-area {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    width: 100%;
+}
+
+/* ===== Botoes ===== */
+.btn-primary {
+    background: var(--color-primary);
+    color: var(--color-text);
+    padding: 14px 28px;
+    border-radius: var(--radius-pill);
+    border: 3px solid var(--color-primary-dark);
+    font-family: inherit;
+    font-size: var(--fs-md);
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+    min-height: var(--tap-min);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+.btn-primary:active {
+    transform: translateY(0) scale(0.97);
+}
+.btn-primary:focus-visible {
+    outline: 3px solid var(--color-info);
+    outline-offset: 3px;
+}
+
+.btn-secondary {
+    background: #FFF;
+    color: var(--color-text);
+    padding: 12px 22px;
+    border-radius: var(--radius-pill);
+    border: 2px solid var(--color-secondary);
+    font-family: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    min-height: var(--tap-min);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+.btn-secondary:hover { transform: translateY(-1px); }
+.btn-secondary:active { transform: scale(0.97); }
+
+.btn-back {
+    background: #FFF;
+    color: var(--color-text);
+    padding: 10px 18px;
+    border-radius: var(--radius-pill);
+    border: 2px solid var(--color-locked);
+    font-family: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+.btn-back:hover { background: var(--color-bg-1); }
+
+/* ===== Card ===== */
+.card {
+    background: #FFF;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 18px;
+}
+
+/* ===== Coin badge ===== */
+.coin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--color-accent);
+    color: #FFF;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+}
+.coin-badge .coin-icon { font-size: 1.1em; }
+
+/* ===== Barra de navegacao principal ===== */
+.main-nav {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    background: #FFF;
+    padding: 8px;
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-lg);
+    z-index: var(--z-nav);
+    max-width: calc(100vw - 28px);
+}
+.main-nav button {
+    background: transparent;
+    color: var(--color-text);
+    padding: 10px 18px;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-family: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    cursor: pointer;
+    min-height: var(--tap-min);
+    transition: background 0.15s ease, transform 0.15s ease;
+    white-space: nowrap;
+}
+.main-nav button:hover { background: var(--color-bg-1); }
+.main-nav button[aria-current="true"] {
+    background: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+}
+.main-nav button:active { transform: scale(0.96); }
+
+/* Quando a barra esta visivel, dar respiro no fim do conteudo das telas */
+body.has-main-nav .screen.active {
+    padding-bottom: 96px;
+}
+
+@media (max-width: 480px) {
+    .main-nav button {
+        padding: 8px 12px;
+        font-size: var(--fs-xs);
+    }
+}
+
+/* ===== Splash refatorado (logo + mascotes + 2 botoes) — fullscreen sem scroll ===== */
+#splash {
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-3);
+}
+.splash-brand {
+    width: clamp(180px, 60vw, 340px);
+    max-height: 30vh;
+    height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    background: rgba(255, 255, 255, 0.7);
+    padding: var(--space-2) var(--space-3);
+    object-fit: contain;
+    animation: pop 0.6s ease-out;
+    flex-shrink: 0;
+}
+.splash-mascots {
+    width: clamp(180px, 56vw, 320px);
+    max-height: 28vh;
+    height: auto;
+    border-radius: var(--radius-lg);
+    object-fit: contain;
+    box-shadow: var(--shadow-md);
+    background: rgba(255, 255, 255, 0.5);
+    padding: var(--space-1);
+    animation: float 3.5s ease-in-out infinite;
+    flex-shrink: 0;
+}
+#splash .subtitle {
+    flex-shrink: 0;
+    text-align: center;
+    font-size: var(--fs-body);
+    max-width: 92vw;
+}
+.splash-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: center;
+    margin-top: var(--space-2);
+    flex-shrink: 0;
+}
+
+/* ===== Tela #badges (medalhas grandes) — paginada, sem scroll ===== */
+.badges-grid-large {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    width: 100%;
+    max-width: 920px;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+.badges-summary {
+    background: var(--color-accent);
+    color: #FFF;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-md);
+    font-weight: 700;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    align-self: center;
+    flex-shrink: 0;
+}
+.badges-pager-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 540px) {
+    .badges-pager-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== Raridade das medalhas ===== */
+.badge-card { position: relative; }
+.badge-rarity-ribbon {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    color: #FFF;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+.badge-card.rarity-common .badge-rarity-ribbon { background: #9E9E9E; }
+.badge-card.rarity-rare   .badge-rarity-ribbon { background: #29B6F6; }
+.badge-card.rarity-epic   .badge-rarity-ribbon { background: #9C27B0; }
+.badge-card.rarity-legendary .badge-rarity-ribbon { background: linear-gradient(90deg, #FFC107, #FF9800); }
+
+/* Halos por raridade quando earned */
+.badge-card.earned.rarity-rare {
+    box-shadow: 0 0 0 2px #29B6F6, var(--shadow-md);
+    animation: rarePulse 3.2s ease-in-out infinite;
+}
+.badge-card.earned.rarity-epic {
+    box-shadow: 0 0 0 2px #9C27B0, var(--shadow-md);
+    animation: epicPulse 2.8s ease-in-out infinite;
+}
+.badge-card.earned.rarity-legendary {
+    box-shadow: 0 0 0 3px #FF9800, 0 0 24px rgba(255, 152, 0, 0.55), var(--shadow-md);
+    animation: legendaryPulse 2.5s ease-in-out infinite;
+}
+
+/* Fase 7 - Game Feel: glow continuo escalonado por raridade. */
+@keyframes rarePulse {
+    0%, 100% { box-shadow: 0 0 0 2px #29B6F6, 0 0 8px rgba(41, 182, 246, 0.25), var(--shadow-md); }
+    50%      { box-shadow: 0 0 0 3px #29B6F6, 0 0 18px rgba(41, 182, 246, 0.55), var(--shadow-md); }
+}
+@keyframes epicPulse {
+    0%, 100% { box-shadow: 0 0 0 2px #9C27B0, 0 0 14px rgba(156, 39, 176, 0.40), var(--shadow-md); }
+    50%      { box-shadow: 0 0 0 3px #BA68C8, 0 0 26px rgba(156, 39, 176, 0.70), var(--shadow-md); }
+}
+@keyframes legendaryPulse {
+    0%, 100% { box-shadow: 0 0 0 3px #FF9800, 0 0 24px rgba(255, 152, 0, 0.45), var(--shadow-md); }
+    50%      { box-shadow: 0 0 0 3px #FFB300, 0 0 36px rgba(255, 152, 0, 0.75), var(--shadow-lg); }
+}
+.badge-card {
+    background: #FFF;
+    border-radius: var(--radius-lg);
+    padding: 18px 12px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s ease;
+}
+.badge-card.earned {
+    background: linear-gradient(135deg, #FFF9C4, #FFD54F);
+    border: 3px solid var(--color-primary-dark);
+    animation: badgePop 0.5s ease;
+}
+.badge-card.locked {
+    filter: grayscale(0.7);
+    opacity: 0.6;
+}
+.badge-card.earned:hover { transform: translateY(-3px); }
+.badge-card-icon {
+    font-size: 56px;
+    width: 88px;
+    height: 88px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFF;
+    border-radius: 50%;
+    box-shadow: var(--shadow-sm);
+}
+.badge-card-name {
+    font-size: var(--fs-md);
+    font-weight: 700;
+    color: var(--color-text);
+}
+.badge-card-desc {
+    font-size: var(--fs-xs);
+    color: #555;
+    line-height: 1.3;
+}
+
+/* ===== Tela #parents (placeholder) ===== */
+.parents-card {
+    background: #FFF;
+    border-radius: var(--radius-lg);
+    padding: 32px 28px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    margin-top: 20px;
+}
+.parents-emoji {
+    font-size: 72px;
+    margin-bottom: 12px;
+}
+.parents-card h3 {
+    font-size: var(--fs-lg);
+    color: var(--color-text);
+    margin-bottom: 10px;
+}
+.parents-card p {
+    font-size: var(--fs-sm);
+    color: #555;
+    line-height: 1.5;
+}
+
+/* Titulo padrao para telas (badges, parents) */
+.screen-title {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    color: var(--color-text);
+    text-align: center;
+    margin: 14px 0 18px;
+}
+
+/* ===== Estrelas no LevelCard ===== */
+.phase-stars {
+    position: absolute;
+    top: -10px;
+    right: -6px;
+    display: flex;
+    gap: 1px;
+    background: #FFF;
+    padding: 3px 6px;
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-sm);
+}
+.phase-stars .phase-star {
+    position: static;
+    font-size: 14px;
+    animation: none;
+}
+.phase-stars .phase-star.off {
+    filter: grayscale(1);
+    opacity: 0.35;
+}
+.phase-stars .phase-star.on {
+    animation: starPulse 2s ease-in-out infinite;
+}
+
+/* ===== Estrelas na tela de resultado ===== */
+.result-stars {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+}
+.result-star {
+    font-size: 40px;
+    transition: transform 0.4s ease;
+}
+.result-star.off {
+    filter: grayscale(1);
+    opacity: 0.3;
+}
+.result-star.on {
+    animation: starPulse 1.4s ease-in-out infinite;
+}
+
+/* ===== Lock overlay e estados em phase-card (data-state) ===== */
+.phase-card[data-state="locked"] {
+    position: relative;
+}
+.phase-card[data-state="locked"] .phase-lock {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    pointer-events: none;
+}
+.phase-card[data-state="available"] {
+    border: 3px solid var(--island-color, var(--color-primary));
+    background: linear-gradient(145deg,
+        color-mix(in srgb, var(--island-color, #FFF) 10%, white),
+        white 70%);
+    animation: availablePulse 2.4s ease-in-out infinite;
+}
+@keyframes availablePulse {
+    0%, 100% { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.10); }
+    50%      { box-shadow: 0 6px 22px color-mix(in srgb, var(--island-color, #FFD54F) 55%, transparent); }
+}
+
+/* Hover lift adicional na phase-card (Fase 7 - polish) */
+.phase-card:not(.locked):hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 10px 22px rgba(31, 45, 61, 0.18);
+}
+.phase-card[data-state="completed"] {
+    background: linear-gradient(145deg,
+        color-mix(in srgb, var(--island-color, #FFF8E1) 14%, white),
+        white 65%);
+}
+
+/* Fase 9 - Onda 3.2: molduras aplicadas em fases completas (cosmetico comprado na loja). */
+.phase-card[data-frame="frame-gold"] {
+    box-shadow: 0 0 0 3px #FFC107, 0 0 16px rgba(255, 193, 7, 0.55), var(--shadow-md);
+    border-color: #FFB300 !important;
+}
+.phase-card[data-frame="frame-neon"] {
+    box-shadow: 0 0 0 2px #00E5FF, 0 0 18px rgba(0, 229, 255, 0.7), var(--shadow-md);
+    border-color: #00E5FF !important;
+}
+.phase-card[data-frame="frame-holo"] {
+    background: linear-gradient(135deg, #FFCDD2 0%, #FFF9C4 25%, #C8E6C9 50%, #BBDEFB 75%, #E1BEE7 100%) !important;
+    box-shadow: 0 0 0 2px #FFF, 0 0 22px rgba(186, 104, 200, 0.55), var(--shadow-md);
+    animation: holoShift 4s linear infinite;
+}
+@keyframes holoShift {
+    0%   { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+/* ===== Sons & Silabas (fases 17-20) ===== */
+.syllable-slots {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin: 12px 0 6px;
+}
+.syllable-slot {
+    width: 96px;
+    min-height: 84px;
+    border: 4px dashed var(--color-locked);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--color-text);
+    background: #FFF;
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.15s ease;
+}
+.syllable-slot.filled {
+    border-style: solid;
+    border-color: var(--color-primary-dark);
+    background: var(--color-bg-1);
+}
+.syllable-preview {
+    text-align: center;
+    font-size: 36px;
+    font-weight: 700;
+    min-height: 48px;
+    color: var(--color-text);
+    letter-spacing: 4px;
+}
+.syllable-preview.correct { color: var(--color-success); }
+.syllable-preview.wrong { color: var(--color-warning); }
+.syllable-options { gap: 12px; }
+.syllable-option {
+    min-width: 84px;
+    font-size: 28px;
+}
+
+@media (max-width: 480px) {
+    .splash-brand { width: 80vw; max-height: 22vh; }
+    .splash-mascots { width: 80vw; max-height: 24vh; }
+    .syllable-slot { width: 78px; min-height: 68px; font-size: 32px; }
+}
+@media (max-height: 700px) {
+    #splash { gap: var(--space-2); }
+    .splash-brand { max-height: 20vh; }
+    .splash-mascots { max-height: 22vh; }
+    #splash .subtitle { font-size: 14px; padding: 4px 10px; }
+}
+
+/* ===== Menu paginado por ilha ===== */
+/* Fase 12.2: botao "Treinar" no header da ilha (so aparece se ha fases completas) */
+.menu-train-btn {
+    background: white;
+    color: var(--color-text);
+    border: 2px solid var(--color-info);
+    border-radius: var(--radius-pill);
+    padding: 8px 14px;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+.menu-train-btn:hover { transform: translateY(-2px); background: var(--color-bg-1); }
+.menu-train-icon { font-size: 18px; }
+
+/* Fase 7 - Game Feel: cor da ilha vaza sutilmente para o fundo do menu */
+#menu {
+    background:
+        radial-gradient(ellipse at top,
+            color-mix(in srgb, var(--island-color, #FFF8E1) 18%, white) 0%,
+            white 65%);
+    transition: background 0.4s ease;
+}
+
+.menu-host {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    max-width: 920px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: center;
+}
+.menu-island-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    background: linear-gradient(135deg, var(--island-color, #7E57C2), color-mix(in srgb, var(--island-color, #7E57C2) 70%, white));
+    color: #FFF;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    flex-shrink: 0;
+}
+.menu-island-emoji {
+    font-size: clamp(32px, 6vw, 48px);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+.menu-island-titleblock { display: flex; flex-direction: column; gap: 2px; }
+.menu-island-title {
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0;
+}
+.menu-island-progress {
+    font-size: var(--fs-body);
+    opacity: 0.95;
+}
+.menu-pager-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 540px) {
+    .menu-pager-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== Pager (paginacao interna sem scroll) ===== */
+.pager-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    max-width: 920px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+.pager-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    overflow: hidden;
+    padding: var(--space-2);
+}
+.pager-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.pager-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.pager-grid.cols-auto { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.pager-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #777;
+    padding: var(--space-5);
+}
+.pager-controls {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.pager-btn {
+    background: #FFF;
+    color: var(--color-text);
+    border: 2px solid var(--color-locked);
+    border-radius: var(--radius-pill);
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+.pager-btn:hover:not(:disabled) { background: var(--color-bg-1); transform: translateY(-1px); }
+.pager-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.pager-indicator {
+    font-weight: 700;
+    font-size: var(--fs-md);
+    color: var(--color-text);
+    min-width: 60px;
+    text-align: center;
+}
+
+/* ===== Atividade / Result / Celebration sem overflow ===== */
+#activity {
+    gap: var(--space-2);
+    justify-content: flex-start;
+}
+#activity .activity-header,
+#activity .progress-bar-container,
+#activity .instruction {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 920px;
+}
+#activity .activity-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    max-width: 920px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2);
+}
+#result, #celebration {
+    justify-content: center;
+    gap: var(--space-4);
+}
+#result .result-emoji, #celebration h2 { flex-shrink: 0; }
+
+/* ===== Tabs ===== */
+.tabs-bar {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-1);
+    background: #FFF;
+    border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    max-width: 100%;
+}
+.tabs-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    background: transparent;
+    color: var(--color-text);
+    padding: 8px 14px;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-family: inherit;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+    min-height: var(--tap-min);
+}
+.tab-btn:hover { background: var(--color-bg-1); }
+.tab-btn[aria-selected="true"] {
+    background: var(--color-primary);
+    color: var(--color-text);
+    box-shadow: var(--shadow-sm);
+}
+.tab-emoji { font-size: 1.1em; }
+
+/* ===== Shop layout (Onda B) ===== */
+#shop {
+    gap: var(--space-3);
+    justify-content: flex-start;
+}
+#shopContent {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    max-width: 920px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: center;
+}
+.shop-topbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+.shop-screen-title {
+    font-size: var(--fs-h2);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+}
+.shop-pager-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+@media (min-width: 720px) {
+    .shop-pager-grid { grid-template-columns: repeat(2, 1fr); max-width: 720px; margin: 0 auto; }
+}
+.shop-card {
+    background: #FFF;
+    border-radius: var(--radius-lg);
+    padding: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+}
+.shop-card.equipped {
+    border: 3px solid var(--color-secondary);
+    background: linear-gradient(180deg, #F1F8E9, #FFFFFF);
+}
+.shop-card.locked { opacity: 0.5; }
+.shop-card-preview {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 110px;
+    background: var(--color-bg-1);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.shop-card-icon { font-size: clamp(40px, 8vw, 64px); display: inline-block; }
+
+/* Fase 7 - Game Feel: preview animado por categoria. */
+.shop-card[data-category="mascot"]    .shop-card-icon { animation: float 3.2s ease-in-out infinite; }
+.shop-card[data-category="theme"]     .shop-card-icon { animation: themeAnimatedPulse 2.5s ease-in-out infinite; }
+.shop-card[data-category="effect"]    .shop-card-icon { animation: starPulse 1.8s ease-in-out infinite; }
+.shop-card[data-category="accessory"] .shop-card-icon { animation: bounce 2.4s ease-in-out infinite; }
+.shop-card.locked .shop-card-icon { animation: none; opacity: 0.5; }
+.shop-card-name { font-weight: 700; font-size: var(--fs-sm); text-align: center; }
+/* Fase 9 - Onda 3: descricao para powerups */
+.shop-card-desc {
+    font-size: var(--fs-xs);
+    color: var(--color-text);
+    opacity: 0.75;
+    text-align: center;
+    line-height: 1.25;
+    padding: 0 6px;
+}
+/* Powerups com animacao especifica no icone (vibracao sutil) */
+.shop-card[data-category="powerup"]  .shop-card-icon { animation: pop 0.6s ease, float 2.6s ease-in-out 0.6s infinite; }
+.shop-card[data-category="frame"]    .shop-card-icon { animation: rainbowFloat 4s ease-in-out infinite; }
+.shop-card-price { font-size: var(--fs-xs); color: var(--color-text); }
+.shop-card-action {
+    background: var(--color-primary);
+    color: var(--color-text);
+    border: 2px solid var(--color-primary-dark);
+    border-radius: var(--radius-pill);
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 36px;
+    width: 100%;
+}
+.shop-card-action:disabled {
+    background: var(--color-locked);
+    color: #FFF;
+    border-color: var(--color-locked);
+    cursor: not-allowed;
+}
+.shop-card-hint { font-size: 11px; color: #777; text-align: center; }
+.shop-flash {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 138, 101, 0.92);
+    color: #FFF;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-2);
+    animation: pop 0.2s ease;
+    z-index: 3;
+}
+
+/* ===== Shop polish (legacy classes) ===== */
+.shop-section-emoji { font-size: 1.2em; margin-right: 4px; }
+.shop-card-seal {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: var(--color-secondary);
+    color: #FFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+    z-index: 2;
+}
+
+/* ===== Fase 9.15/9.16: Powerup Bar dentro de #activity ===== */
+#activity .powerup-bar {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: center;
+    align-items: center;
+    margin: var(--space-1) 0;
+    flex-wrap: wrap;
+}
+.powerup-btn {
+    background: white;
+    border: 2px solid var(--color-locked);
+    border-radius: var(--radius-pill);
+    padding: 6px 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-sm);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, border-color 0.2s ease;
+    min-height: 38px;
+}
+.powerup-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: var(--color-primary-dark);
+}
+.powerup-btn:disabled, .powerup-btn[data-stock="0"] {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.powerup-btn .pw-icon { font-size: 22px; }
+.powerup-btn .pw-stock {
+    background: var(--color-secondary);
+    color: white;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 1px 8px;
+    border-radius: var(--radius-pill);
+    min-width: 22px;
+    text-align: center;
+}
+.powerup-btn[data-stock="0"] .pw-stock { background: var(--color-locked); }
+.powerup-btn.flash { animation: pop 0.4s ease; }
+
+/* Botao "Tenta de Novo" no overlay de feedback (Fase 9.16) */
+.feedback-overlay .retry-btn {
+    margin-top: var(--space-3);
+    background: var(--color-accent);
+    color: white;
+    border: 3px solid #BF360C;
+    border-radius: var(--radius-pill);
+    padding: 12px 24px;
+    font-size: var(--fs-body);
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    animation: pop 0.4s ease;
+    transition: transform 0.15s ease;
+}
+.feedback-overlay .retry-btn:hover { transform: translateY(-2px); }
+.feedback-overlay .retry-btn:active { transform: translateY(0) scale(0.97); }
+
+/* Hint pulse (Fase 9.15): destaca a resposta correta por 1s */
+.hint-pulse {
+    animation: hintPulse 1s ease-in-out 3;
+    box-shadow: 0 0 0 4px rgba(255, 213, 79, 0.9), 0 0 24px rgba(255, 213, 79, 0.7);
+    z-index: 10;
+    position: relative;
+}
+@keyframes hintPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.08); }
+}
+
+/* ===== Fase 11.1: Cerimonia de ilha completa ===== */
+.island-completion-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 410;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.5s ease;
+    padding: var(--space-3);
+}
+.island-completion-card {
+    background: linear-gradient(145deg, white 0%, color-mix(in srgb, var(--island-color, #FFD54F) 12%, white) 100%);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5) var(--space-4);
+    text-align: center;
+    box-shadow: 0 16px 60px rgba(0,0,0,0.5);
+    border: 5px solid var(--island-color, var(--color-primary));
+    animation: rankupZoom 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: min(92vw, 480px);
+    position: relative;
+    z-index: 2;
+}
+.island-completion-mascot {
+    width: clamp(120px, 24vw, 180px);
+    height: clamp(120px, 24vw, 180px);
+    border-radius: 50%;
+    background: white;
+    border: 5px solid var(--island-color, var(--color-primary));
+    margin: 0 auto var(--space-3) auto;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    animation: bounce 0.8s ease 0.4s;
+}
+.island-completion-mascot img { width: 100%; height: 100%; object-fit: cover; }
+.island-completion-emoji { font-size: clamp(60px, 14vw, 100px); }
+.island-completion-headline {
+    font-size: var(--fs-md);
+    color: var(--color-text);
+    opacity: 0.85;
+    margin-bottom: var(--space-1);
+}
+.island-completion-name {
+    font-size: clamp(28px, 6vw, 42px);
+    font-weight: 700;
+    color: var(--island-color, var(--color-primary-dark));
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    margin-bottom: var(--space-2);
+}
+.island-completion-congrats {
+    font-size: var(--fs-body);
+    color: var(--color-text);
+    line-height: 1.4;
+    margin-bottom: var(--space-3);
+}
+.island-completion-bonus {
+    background: rgba(255, 213, 79, 0.25);
+    color: var(--color-primary-dark);
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    display: inline-block;
+    margin-bottom: var(--space-3);
+    font-size: var(--fs-md);
+    border: 2px solid var(--color-primary);
+}
+.island-completion-close { padding: 12px 28px; font-size: var(--fs-md); }
+
+/* ===== Fase 10.3: Area dos Pais (PIN + dashboard) ===== */
+#parents {
+    overflow-y: auto !important;
+    align-items: center;
+    padding: var(--space-3);
+}
+.parents-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+    margin-top: var(--space-3);
+    border: 3px solid var(--color-info);
+}
+.parents-card .parents-emoji { font-size: 56px; margin-bottom: var(--space-2); }
+.parents-card h3 { margin: 0 0 var(--space-2) 0; font-size: var(--fs-md); color: var(--color-text); }
+.parents-card p { margin: 0 0 var(--space-3) 0; color: var(--color-text); opacity: 0.8; }
+
+.parents-pin {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: center;
+    margin: var(--space-3) 0;
+    flex-wrap: wrap;
+}
+.parents-pin-digit {
+    width: 50px;
+    height: 60px;
+    font-size: 28px;
+    text-align: center;
+    border: 3px solid var(--color-info);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-weight: 700;
+    background: white;
+}
+.parents-pin-digit:focus {
+    outline: 3px solid var(--color-primary);
+    border-color: var(--color-primary-dark);
+}
+.parents-pin.flash-error .parents-pin-digit { border-color: #E53935; }
+.parents-pin-err {
+    width: 100%;
+    color: #E53935;
+    font-size: var(--fs-xs);
+    text-align: center;
+    min-height: 16px;
+    margin-top: 4px;
+}
+
+/* Dashboard */
+.parents-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+    width: 100%;
+    max-width: 600px;
+    margin: var(--space-3) auto;
+}
+.parents-stat-card {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    border: 2px solid var(--color-bg-2);
+}
+.parents-stat-icon { font-size: 28px; margin-bottom: 4px; }
+.parents-stat-value { font-size: var(--fs-md); font-weight: 700; color: var(--color-text); }
+.parents-stat-label { font-size: var(--fs-xs); color: var(--color-text); opacity: 0.7; margin-top: 2px; }
+
+.parents-section-title {
+    text-align: center;
+    color: var(--color-text);
+    margin: var(--space-3) 0 var(--space-2);
+    font-size: var(--fs-md);
+}
+.parents-islands-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.parents-island-row {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    box-shadow: var(--shadow-sm);
+    border-left: 5px solid var(--island-color);
+}
+.parents-island-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: 6px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+.parents-island-emoji { font-size: 20px; }
+.parents-island-name { flex: 1; }
+.parents-island-count { font-size: var(--fs-sm); color: var(--color-text); opacity: 0.7; }
+.parents-island-bar {
+    height: 8px;
+    background: #EEE;
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+}
+.parents-island-bar-fill {
+    height: 100%;
+    background: var(--island-color);
+    border-radius: var(--radius-pill);
+    transition: width 0.4s ease;
+}
+
+/* Fase 11.3: secao de backup/restore */
+.parents-backup {
+    margin-top: var(--space-4);
+    padding: var(--space-3);
+    background: white;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--color-info);
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+}
+.parents-backup-help {
+    font-size: var(--fs-xs);
+    color: var(--color-text);
+    opacity: 0.8;
+    margin: var(--space-2) 0;
+}
+.parents-backup-btns {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: var(--space-2);
+}
+.parents-backup-btns button { min-width: 180px; }
+
+.parents-danger {
+    margin-top: var(--space-4);
+    padding: var(--space-3);
+    background: #FFEBEE;
+    border-radius: var(--radius-md);
+    border: 2px solid #FFCDD2;
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+}
+.parents-danger-title { color: #C62828; font-weight: 700; margin-bottom: var(--space-2); }
+.parents-danger-btn {
+    background: #E53935;
+    color: white;
+    border: 2px solid #B71C1C;
+    border-radius: var(--radius-pill);
+    padding: 10px 20px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+.parents-danger-btn:hover { transform: translateY(-2px); }
+
+/* ===== Fase 10.2: Tutorial inicial overlay ===== */
+.tutorial-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 380;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+.tutorial-card {
+    width: min(90vw, 320px);
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    border: 4px solid var(--color-primary);
+    animation: pop 0.4s ease;
+    text-align: center;
+}
+.tutorial-title {
+    font-size: var(--fs-md);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-2) 0;
+    line-height: 1.3;
+}
+.tutorial-text {
+    font-size: var(--fs-body);
+    color: var(--color-text);
+    margin: 0 0 var(--space-3) 0;
+    line-height: 1.4;
+}
+.tutorial-counter {
+    font-size: var(--fs-xs);
+    color: var(--color-locked);
+    margin-bottom: var(--space-3);
+    font-weight: 700;
+}
+.tutorial-actions {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: center;
+}
+.tutorial-skip { padding: 8px 16px; }
+.tutorial-next { padding: 10px 20px; }
+
+/* ===== Fase 10.1: Celebracao de Rank-up (overlay grande full-screen) ===== */
+.rankup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+    animation: fadeIn 0.4s ease;
+}
+.rankup-card {
+    background: linear-gradient(145deg, #FFF8E1, white 70%);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5) var(--space-6);
+    text-align: center;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.4);
+    border: 4px solid var(--color-primary);
+    animation: rankupZoom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 90vw;
+}
+.rankup-card[data-rank="adventurer"] { border-color: #66BB6A; }
+.rankup-card[data-rank="master"] {
+    border-color: #9C27B0;
+    box-shadow: 0 12px 48px rgba(156,39,176,0.5), 0 0 30px rgba(156,39,176,0.4);
+}
+.rankup-card[data-rank="legend"] {
+    border-color: #FFB300;
+    box-shadow: 0 12px 48px rgba(255,179,0,0.6), 0 0 36px rgba(255,179,0,0.5);
+    animation: rankupZoom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), legendaryPulse 2.5s ease-in-out 0.6s infinite;
+}
+.rankup-icon {
+    font-size: clamp(60px, 14vw, 110px);
+    line-height: 1;
+    margin-bottom: var(--space-2);
+    animation: bounce 0.8s ease;
+}
+.rankup-subtitle {
+    font-size: var(--fs-body);
+    color: var(--color-text);
+    opacity: 0.7;
+    margin-bottom: var(--space-1);
+}
+.rankup-name {
+    font-size: clamp(28px, 6vw, 48px);
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    margin-bottom: var(--space-2);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+}
+.rankup-bonus {
+    font-size: var(--fs-md);
+    color: var(--color-secondary);
+    font-weight: 700;
+    background: rgba(102, 187, 106, 0.15);
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    display: inline-block;
+}
+@keyframes rankupZoom {
+    0%   { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+    60%  { transform: scale(1.1) rotate(2deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.rankup-confetti {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+.rankup-confetti-piece {
+    position: absolute;
+    top: -24px;
+    width: 12px;
+    height: 16px;
+    border-radius: 2px;
+    animation: confettiDrop linear forwards;
+}
+
+/* ===== Fase 9.17: Card de Missoes Diarias no #islandMap ===== */
+.missions-card {
+    width: min(95%, 720px);
+    margin: var(--space-2) auto 0;
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFFDE7 100%);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-3);
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--color-primary);
+}
+.missions-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 700;
+    color: var(--color-text);
+    font-size: var(--fs-body);
+    margin-bottom: var(--space-2);
+}
+.missions-header .missions-icon { font-size: 22px; }
+.missions-list { display: flex; flex-direction: column; gap: var(--space-2); }
+.mission-row {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    background: white;
+    border-radius: var(--radius-md);
+    border: 1px solid #FFE0B2;
+    transition: all 0.2s ease;
+}
+.mission-row.complete {
+    border-color: var(--color-secondary);
+    background: linear-gradient(90deg, #C8E6C9 0%, white 60%);
+    animation: missionCompleteGlow 2s ease-in-out infinite;
+}
+.mission-row.claimed { opacity: 0.55; }
+.mission-icon { font-size: 22px; text-align: center; }
+.mission-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mission-label {
+    font-weight: 700;
+    color: var(--color-text);
+    font-size: var(--fs-sm);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mission-bar {
+    height: 8px;
+    background: #EEE;
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+}
+.mission-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    transition: width 0.4s ease;
+    border-radius: var(--radius-pill);
+}
+.mission-meta { font-size: 11px; color: var(--color-text); opacity: 0.65; }
+.mission-action {
+    background: var(--color-secondary);
+    color: white;
+    border: 2px solid #2E7D32;
+    border-radius: var(--radius-pill);
+    padding: 6px 12px;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease;
+    min-width: 56px;
+}
+.mission-action:hover:not(:disabled) { transform: translateY(-2px); }
+.mission-action:disabled { opacity: 0.5; cursor: default; }
+.mission-action.done { background: #BDBDBD; border-color: #757575; }
+@keyframes missionCompleteGlow {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(102, 187, 106, 0.3); }
+    50%      { box-shadow: 0 0 0 4px rgba(102, 187, 106, 0.55); }
+}
+
+/* ===== Fase 9.18: Rank Pill no HUD + Coin Pill ===== */
+#hud .rank-pill, #hud .coin-pill {
+    background: white;
+    border-radius: var(--radius-pill);
+    padding: 8px 14px;
+    box-shadow: var(--shadow-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text);
+}
+#hud .rank-pill {
+    cursor: help;
+    border: 2px solid transparent;
+    transition: transform 0.2s ease, border-color 0.3s ease;
+}
+#hud .rank-pill:hover { transform: translateY(-2px); }
+#hud .rank-pill[data-rank="adventurer"] { border-color: #66BB6A; }
+#hud .rank-pill[data-rank="master"]     { border-color: #9C27B0; box-shadow: 0 0 12px rgba(156,39,176,0.4); }
+#hud .rank-pill[data-rank="legend"]     { border-color: #FFB300; box-shadow: 0 0 16px rgba(255,179,0,0.6); animation: legendaryPulse 2.5s ease-in-out infinite; }
+#hud #rankIcon { font-size: 20px; }
+#hud .coin-pill { background: linear-gradient(135deg, #FFF8E1 0%, white 100%); }
+#hud .coin-pill .hud-icon { font-size: 22px; }
+
+/* ===== Fase 7 - Acessibilidade: respeita prefers-reduced-motion ===== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

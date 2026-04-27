@@ -27,10 +27,10 @@ describe('checkBadges', () => {
         expect(checkBadges(makeState())).not.toContain('first-star');
     });
 
-    it('awards halfway at 6 phases, all-complete at 12', () => {
-        const half = makeState({ completedPhases: [1, 2, 3, 4, 5, 6] });
+    it('awards halfway at 15 phases, all-complete at 50 (after 75-phase rework)', () => {
+        const half = makeState({ completedPhases: Array.from({ length: 15 }, (_, i) => i + 1) });
         expect(checkBadges(half)).toContain('halfway');
-        const all = makeState({ completedPhases: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] });
+        const all = makeState({ completedPhases: Array.from({ length: 50 }, (_, i) => i + 1) });
         expect(checkBadges(all)).toContain('all-complete');
     });
 
@@ -45,8 +45,8 @@ describe('checkBadges', () => {
         expect(checkBadges(makeState(), 'memory-master')).toContain('memory-master');
     });
 
-    it('awards logic-start only when a phase >= 9 completed', () => {
-        expect(checkBadges(makeState({ completedPhases: [1, 2, 3, 4, 5, 6, 7, 8] }))).not.toContain('logic-start');
+    it('awards logic-start only when a logic-tier phase (6-15 in Letras island) completed', () => {
+        expect(checkBadges(makeState({ completedPhases: [1, 2, 3, 4, 5] }))).not.toContain('logic-start');
         expect(checkBadges(makeState({ completedPhases: [9] }))).toContain('logic-start');
     });
 
@@ -152,10 +152,30 @@ describe('rewardForPhaseEnd', () => {
     it('awards phaseComplete when passed, extra when perfect and firstTime', () => {
         const base = rewardForPhaseEnd(makeState(), { phaseId: 1, passed: true, perfect: false, firstTime: false });
         expect(base.coinsAwarded).toBe(COIN_REWARDS.phaseComplete);
+        // perfect=true sem percent => deduz 3 estrelas => +40 de bonus
+        const STAR3_BONUS = 40;
         const perf = rewardForPhaseEnd(makeState(), { phaseId: 1, passed: true, perfect: true, firstTime: true });
         expect(perf.coinsAwarded).toBe(
-            COIN_REWARDS.phaseComplete + COIN_REWARDS.phasePerfect + COIN_REWARDS.firstTimeCompletePhase,
+            COIN_REWARDS.phaseComplete + STAR3_BONUS + COIN_REWARDS.phasePerfect + COIN_REWARDS.firstTimeCompletePhase,
         );
+        expect(perf.stars).toBe(3);
+    });
+
+    it('uses percent to derive stars (1/2/3)', () => {
+        const s1 = rewardForPhaseEnd(makeState(), { phaseId: 1, passed: true, percent: 70 });
+        expect(s1.stars).toBe(1);
+        const s2 = rewardForPhaseEnd(makeState(), { phaseId: 2, passed: true, percent: 88 });
+        expect(s2.stars).toBe(2);
+        const s3 = rewardForPhaseEnd(makeState(), { phaseId: 3, passed: true, percent: 100 });
+        expect(s3.stars).toBe(3);
+    });
+
+    it('preserves best stars when replaying', () => {
+        const state = makeState();
+        rewardForPhaseEnd(state, { phaseId: 5, passed: true, percent: 100 });
+        expect(state.phaseStars[5]).toBe(3);
+        rewardForPhaseEnd(state, { phaseId: 5, passed: true, percent: 70 });
+        expect(state.phaseStars[5]).toBe(3); // mantem o melhor
     });
 });
 

@@ -15,7 +15,7 @@ describe('defaultState', () => {
         const s = defaultState();
         ['completedPhases','drawingsUsed','badges','streak','bestStreak','totalCorrect',
          'coins','totalCoinsEarned','ownedItems','equipped','lastPlayDay','dailyStreak',
-         'recentRounds','phaseStats','version'].forEach((k) => {
+         'recentRounds','phaseStats','phaseStars','hasSeenTutorial','parentsPin','version'].forEach((k) => {
             expect(s).toHaveProperty(k);
         });
     });
@@ -28,7 +28,10 @@ describe('defaultState', () => {
         expect(s.coins).toBe(0);
         expect(s.totalCoinsEarned).toBe(0);
         expect(s.dailyStreak).toBe(0);
-        expect(s.version).toBe(3);
+        expect(s.phaseStars).toEqual({});
+        expect(s.hasSeenTutorial).toBe(false);
+        expect(s.parentsPin).toBeNull();
+        expect(s.version).toBe(5);
     });
 
     it('equipped has defaults per category', () => {
@@ -56,13 +59,44 @@ describe('loadState', () => {
         expect(loadState()).toEqual(defaultState());
     });
 
-    it('loads v3 state from localStorage', () => {
-        const saved = { ...defaultState(), completedPhases: [1, 2, 3], coins: 450, bestStreak: 5 };
+    it('loads v5 state from localStorage', () => {
+        const saved = { ...defaultState(), completedPhases: [1, 2, 3], coins: 450, bestStreak: 5, phaseStars: { 1: 3, 2: 2 } };
         localStorage.setItem(STATE_KEY, JSON.stringify(saved));
         const s = loadState();
         expect(s.completedPhases).toEqual([1, 2, 3]);
         expect(s.coins).toBe(450);
         expect(s.bestStreak).toBe(5);
+        expect(s.phaseStars).toEqual({ 1: 3, 2: 2 });
+    });
+
+    it('migrates v3 -> v4 -> v5 (assigns 1 star per completed phase + tutorial flag)', () => {
+        const v3 = { ...defaultState(), version: 3, completedPhases: [1, 2, 3], coins: 100 };
+        delete v3.phaseStars;
+        delete v3.hasSeenTutorial;
+        delete v3.parentsPin;
+        localStorage.setItem(STATE_KEY, JSON.stringify(v3));
+        const s = loadState();
+        expect(s.version).toBe(5);
+        expect(s.phaseStars[1]).toBe(1);
+        expect(s.phaseStars[2]).toBe(1);
+        expect(s.phaseStars[3]).toBe(1);
+        expect(s.coins).toBe(100);
+        expect(s.hasSeenTutorial).toBe(false);
+        expect(s.parentsPin).toBeNull();
+    });
+
+    it('migrates v4 -> v5 (lossless, adds tutorial+pin defaults)', () => {
+        const v4 = { ...defaultState(), version: 4, completedPhases: [1, 2], coins: 200, phaseStars: { 1: 2 } };
+        delete v4.hasSeenTutorial;
+        delete v4.parentsPin;
+        localStorage.setItem(STATE_KEY, JSON.stringify(v4));
+        const s = loadState();
+        expect(s.version).toBe(5);
+        expect(s.completedPhases).toEqual([1, 2]);
+        expect(s.coins).toBe(200);
+        expect(s.phaseStars).toEqual({ 1: 2 });
+        expect(s.hasSeenTutorial).toBe(false);
+        expect(s.parentsPin).toBeNull();
     });
 
     it('returns default state for corrupted JSON', () => {

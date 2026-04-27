@@ -1,56 +1,55 @@
 import { test, expect } from '@playwright/test';
 
-// Helper que entra no menu de Matematica via ilha "Numeros" com progresso suficiente
-// para destravar a fase 13.
-async function startAtMath(page, name = 'Tche') {
+// Fase 10.4: math agora vive na ilha dos Numeros (fases 16-30).
+// Soma = fase 18, Subtracao = fase 19.
+async function startAtNumbers(page) {
     await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
-    await page.goto('/');
-    await page.fill('#nameInput', name);
-    await page.click('#nameConfirmBtn');
-    await page.click('text=Bah, vamos comecar!');
-    // Simula conclusao das 12 fases iniciais injetando no localStorage.
     await page.evaluate(() => {
-        const s = JSON.parse(localStorage.getItem('thomas_learning_v3') || '{}');
-        s.completedPhases = [1,2,3,4,5,6,7,8,9,10,11,12];
-        localStorage.setItem('thomas_learning_v3', JSON.stringify(s));
+        const KEY = 'thomas_learning_v3';
+        const s = {
+            version: 5,
+            hasSeenTutorial: true,
+            completedPhases: Array.from({ length: 17 }, (_, i) => i + 1), // 1..17
+            equipped: { theme: 'theme-default', mascot: 'mascot-default', accessory: 'acc-none', effect: 'effect-default' },
+        };
+        localStorage.setItem(KEY, JSON.stringify(s));
     });
     await page.reload();
-    await page.click('text=Bah, vamos comecar!');
-    // Clica na ilha de Numeros para chegar ao menu filtrado de Matematica.
+    await page.click('#startBtn');
+    await expect(page.locator('#islandMap')).toBeVisible();
     await page.click('.island-numbers');
+    await expect(page.locator('#menu')).toBeVisible();
 }
 
-test.describe('Matematica (fases 13-16)', () => {
-    test('numeros island opens menu with 4 math cards', async ({ page }) => {
-        await startAtMath(page);
-        const mathGrid = page.locator('#phasesGridMath');
-        await expect(mathGrid).toBeVisible();
-        await expect(mathGrid.locator('.phase-card')).toHaveCount(4);
+test.describe('Matematica (ilha dos Numeros)', () => {
+    test('menu da ilha dos Numeros mostra cards de fase', async ({ page }) => {
+        await startAtNumbers(page);
+        const cards = page.locator('#menu .phase-card');
+        await expect(cards.first()).toBeVisible();
     });
 
-    test('phase 13 Cores opens and shows color options', async ({ page }) => {
-        await startAtMath(page);
-        const mathGrid = page.locator('#phasesGridMath');
-        await mathGrid.locator('.phase-card').first().click();
+    test('fase 18 (Somas) mostra equacao com sinal +', async ({ page }) => {
+        await startAtNumbers(page);
+        await page.locator('#menu .phase-card[data-phase-id="18"]').click();
         await expect(page.locator('#activity')).toBeVisible();
-        await expect(page.locator('#activityTitle')).toContainText('Cores');
-    });
-
-    test('phase 15 Somas shows an equation with + sign', async ({ page }) => {
-        await startAtMath(page);
-        // Desbloqueia ate a fase 15 adicionando 13 e 14 aos completados.
-        await page.evaluate(() => {
-            const s = JSON.parse(localStorage.getItem('thomas_learning_v3') || '{}');
-            s.completedPhases = [...new Set([...(s.completedPhases||[]), 13, 14])];
-            localStorage.setItem('thomas_learning_v3', JSON.stringify(s));
-        });
-        await page.reload();
-        await page.click('text=Bah, vamos comecar!');
-        await page.click('.island-numbers');
-        const mathGrid = page.locator('#phasesGridMath');
-        await mathGrid.locator('.phase-card').nth(2).click();
-        await expect(page.locator('#activity')).toBeVisible();
+        await expect(page.locator('#activityTitle')).toContainText('Somar');
         await expect(page.locator('.math-equation').first()).toContainText('+');
+    });
+
+    test('fase 19 (Subtracoes) mostra equacao com sinal -', async ({ page }) => {
+        await startAtNumbers(page);
+        await page.locator('#menu .phase-card[data-phase-id="19"]').click();
+        await expect(page.locator('#activity')).toBeVisible();
+        await expect(page.locator('#activityTitle')).toContainText('Tirar');
+        await expect(page.locator('.math-equation').first()).toContainText('-');
+    });
+
+    test('opcoes de soma sao botoes clicaveis', async ({ page }) => {
+        await startAtNumbers(page);
+        await page.locator('#menu .phase-card[data-phase-id="18"]').click();
+        const options = page.locator('.option-btn.math-option');
+        await expect(options.first()).toBeVisible();
+        const count = await options.count();
+        expect(count).toBeGreaterThanOrEqual(3);
     });
 });

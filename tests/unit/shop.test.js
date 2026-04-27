@@ -41,23 +41,24 @@ describe('meetsRequirements', () => {
         expect(meetsRequirements({}, makeState())).toBe(true);
     });
 
-    it('bloqueia se totalCoinsEarned insuficiente', () => {
-        const item = shopItemById('theme-galaxy'); // requires 2500
+    it('bloqueia theme-galaxy sem medalha "all-complete"', () => {
+        const item = shopItemById('theme-galaxy'); // Fase 9: requires badge all-complete
         expect(meetsRequirements(item, makeState())).toBe(false);
     });
 
-    it('libera quando totalCoinsEarned atinge o requisito', () => {
-        const item = shopItemById('mascot-gold'); // requires 1000
+    it('libera mascot-gold quando ganha medalha streak-10', () => {
+        const item = shopItemById('mascot-gold'); // Fase 9: requires badge streak-10
         const s = makeState();
-        s.totalCoinsEarned = 1000;
+        expect(meetsRequirements(item, s)).toBe(false);
+        s.badges = ['streak-10'];
         expect(meetsRequirements(item, s)).toBe(true);
     });
 
-    it('bloqueia mascot-rainbow até 6 fases completas', () => {
+    it('bloqueia mascot-rainbow até ganhar a medalha three-stars-10', () => {
         const item = shopItemById('mascot-rainbow');
         const s = makeState();
         expect(meetsRequirements(item, s)).toBe(false);
-        s.completedPhases = [1, 2, 3, 4, 5, 6];
+        s.badges = ['three-stars-10'];
         expect(meetsRequirements(item, s)).toBe(true);
     });
 });
@@ -84,7 +85,11 @@ describe('buyItem', () => {
         const r = buyItem(state, 'theme-space');
         expect(r.ok).toBe(true);
         expect(state.ownedItems).toContain('theme-space');
-        expect(state.coins).toBe(2000 - 200);
+        // Fase 9: medalhas conquistadas via checkBadges() durante a compra creditam moedas extras.
+        // Apos comprar (200 gastos) o state acumula moedas das medalhas (shopper +50, coin-100/coin-1000/pila-500 se totalCoinsEarned bater).
+        // Validamos: gastou os 200 do item (saldo > 0 e itens incluem theme-space).
+        expect(state.coins).toBeGreaterThanOrEqual(2000 - 200);
+        expect(state.totalCoinsSpent).toBe(200);
     });
 
     it('falha por moedas insuficientes', () => {

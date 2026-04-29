@@ -27,7 +27,10 @@ export function applyMascotLook(state) {
 
     const bodyFill = color && color.rainbow ? 'url(#rainbowGrad)' : (color ? color.color : '#FFD54F');
     const bodyStroke = color ? color.stroke : '#F57F17';
-    const accSvg = accessory && accessory.svg ? accessory.svg : '';
+    // Fase 13.6: acessorio maior (scale 1.4x ao redor do centro 50,30 da cabeca).
+    const accSvg = accessory && accessory.svg
+        ? `<g transform="translate(-20,-12) scale(1.4)">${accessory.svg}</g>`
+        : '';
     const sparkle = color && color.sparkle
         ? '<circle cx="30" cy="28" r="2" fill="#FFF9C4"><animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite"/></circle><circle cx="72" cy="36" r="1.5" fill="#FFF9C4"><animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/></circle>'
         : '';
@@ -43,6 +46,10 @@ export function applyMascotLook(state) {
         <circle cx="70" cy="50" r="5" fill="#FFAB91" opacity="0.6"/>
         ${sparkle}
     </svg>`;
+
+    // Fase 13.5: bounce visivel quando equip muda (chamado em equipItem do shop renderer).
+    el.classList.add('just-equipped');
+    setTimeout(() => el.classList.remove('just-equipped'), 700);
 }
 
 export function setMascot(mood, state) {

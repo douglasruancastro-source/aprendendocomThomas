@@ -128,14 +128,22 @@
         <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
         <div class="streak-display" id="streakDisplay">&#x1F525; <span id="streakCount">0</span></div>
     </div>
-    <!-- Fase 9.15/9.16: barra de powerups (so visivel em #activity) -->
+    <!-- Fase 9.15/9.16 + 13.2/13.3: barra de powerups (so visivel em #activity) -->
     <div class="powerup-bar" id="powerupBar" aria-label="Seus powerups">
-        <button class="powerup-btn" data-powerup="powerup-hint" type="button">
+        <button class="powerup-btn" data-powerup="powerup-hint" type="button" title="Dica">
             <span class="pw-icon">&#x1F4A1;</span>
             <span class="pw-stock" data-stock="0">0</span>
         </button>
-        <button class="powerup-btn" data-powerup="powerup-skip" type="button">
+        <button class="powerup-btn" data-powerup="powerup-skip" type="button" title="Pular rodada">
             <span class="pw-icon">&#x23ED;&#xFE0F;</span>
+            <span class="pw-stock" data-stock="0">0</span>
+        </button>
+        <button class="powerup-btn" data-powerup="powerup-retry" type="button" title="Tenta de novo">
+            <span class="pw-icon">&#x1F504;</span>
+            <span class="pw-stock" data-stock="0">0</span>
+        </button>
+        <button class="powerup-btn" data-powerup="powerup-2x" type="button" title="Ativa 2x moedas">
+            <span class="pw-icon">&#x1F4B0;</span>
             <span class="pw-stock" data-stock="0">0</span>
         </button>
     </div>

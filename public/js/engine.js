@@ -7,12 +7,12 @@ import { ACTIVITY_RENDERERS } from './renderers/activities.js';
 import { showFeedback } from './renderers/feedback.js';
 import { setMascot } from './renderers/mascot.js';
 import { animateCoinGain, renderHud } from './renderers/menu.js';
-import { celebrate } from './renderers/celebration.js';
+import { celebrate, spawnConfetti } from './renderers/celebration.js';
 import { saveState } from './state.js';
 import { soundComplete, soundBigReward, soundBadge, soundStreak } from './audio.js';
 import { checkBadges, rewardForAnswer, rewardForPhaseEnd, BADGE_DEFS } from './rewards.js';
 import { recordPhaseResult } from './difficulty.js';
-import { showBadgeNotification, showCoinToast, showStreakBurst, showRankUpCelebration, showIslandCompletionCelebration } from './renderers/feedback.js';
+import { showBadgeNotification, showCoinToast, showStreakBurst, showRankUpCelebration, showIslandCompletionCelebration, showHintHelper } from './renderers/feedback.js';
 import { consumePowerup, powerupStock } from './shop.js';
 import { onCorrectAnswer, onPhaseCompleted, onStreakReached, onCoinEarned } from './missions.js';
 import { getRank, addCoins } from './rewards.js';
@@ -78,18 +78,15 @@ export function startActivity(phaseId, opts = {}) {
     document.body.classList.remove('streak-hot'); // limpa aura de sessao anterior
     setMascot('idle', state);
 
-    // Fase 9 - Onda 3: consome powerup 2x moedas (se houver) e aplica multiplicador na fase.
+    // Fase 13.2: 2x Moedas agora e TOGGLE manual (nao mais auto-consumido).
+    // Reseta multiplicador a cada inicio de fase; criança ativa pelo botao quando quiser.
     state.coinMultiplier = 1;
-    if (powerupStock(state, 'powerup-2x') > 0) {
-        consumePowerup(state, 'powerup-2x');
-        state.coinMultiplier = 2;
-        saveState(state);
-    }
+    saveState(state);
 
     renderRound();
 }
 
-// Atualiza a barra de powerups (Fase 9.15/9.16): mostra estoque atual e habilita/desabilita.
+// Atualiza a barra de powerups (Fase 9.15/9.16/13.2/13.3): mostra estoque + estado ativo.
 function renderPowerupBar() {
     const bar = document.getElementById('powerupBar');
     if (!bar) return;
@@ -99,7 +96,14 @@ function renderPowerupBar() {
         btn.dataset.stock = String(stock);
         const stockEl = btn.querySelector('.pw-stock');
         if (stockEl) stockEl.textContent = stock;
-        btn.disabled = stock === 0;
+        // 2x Moedas tem estado especial "ativo" (consumido pra essa fase).
+        if (id === 'powerup-2x') {
+            const isActive = session.state.coinMultiplier === 2;
+            btn.classList.toggle('active', isActive);
+            btn.disabled = isActive ? false : stock === 0;
+        } else {
+            btn.disabled = stock === 0;
+        }
         // Re-bind onclick (idempotente).
         btn.onclick = () => onPowerupClick(id, btn);
     });
@@ -107,27 +111,61 @@ function renderPowerupBar() {
 
 // Despacha o powerup clicado.
 function onPowerupClick(id, btnEl) {
+    // 2x Moedas pode ser clicado se ja esta ativo (mesmo sem estoque) so para info.
     const stock = powerupStock(session.state, id);
-    if (stock === 0) return;
-    if (id === 'powerup-hint')      useHint();
-    else if (id === 'powerup-skip') useSkip();
+    if (id !== 'powerup-2x' && stock === 0) return;
+    if (id === 'powerup-hint')       useHint();
+    else if (id === 'powerup-skip')  useSkip();
+    else if (id === 'powerup-retry') useRetry();
+    else if (id === 'powerup-2x')    useDoubleCoins();
     btnEl.classList.add('flash');
     setTimeout(() => btnEl.classList.remove('flash'), 500);
 }
 
-// 9.15: Pisca a resposta correta (elemento com [data-correct="true"]).
+// Fase 13.1: dicas textuais para fases sem [data-correct] (find-vowels, build-word, etc).
+function buildHintText(phase, round) {
+    if (!phase || !round) return null;
+    switch (phase.type) {
+        case 'find-vowels':
+            return 'Toque nas VOGAIS: A, E, I, O, U';
+        case 'find-consonants':
+            return 'Vogais sao A, E, I, O, U. Tudo que NAO e vogal e consoante!';
+        case 'build-word':
+            return `A palavra e: ${round.word}`;
+        case 'type-word':
+            return `Digite: ${round.word}`;
+        case 'build-sentence':
+            return `Frase: "${round.sentence.join(' ')}"`;
+        case 'memory-game':
+            return 'Vire 2 cartas iguais para fazer par!';
+        case 'syllable-build':
+            return `Junte para formar: ${round.word}`;
+        default:
+            return null;
+    }
+}
+
+// 9.15 + 13.1: Pisca a resposta correta. Se nao houver alvo marcado,
+// mostra dica textual no topo da tela. Em ambos os casos consome powerup.
 function useHint() {
     const content = document.getElementById('activityContent');
     if (!content) return;
     const target = content.querySelector('[data-correct="true"]');
-    if (!target) {
-        // Sem marcação na fase atual: nada acontece (mas não consome).
+    if (target) {
+        consumePowerup(session.state, 'powerup-hint');
+        saveState(session.state);
+        target.classList.add('hint-pulse');
+        setTimeout(() => target.classList.remove('hint-pulse'), 3000);
+        renderPowerupBar();
         return;
     }
+    // Fallback: dica textual baseada no tipo da fase + round atual.
+    const round = session.rounds[session.roundIdx];
+    const text = buildHintText(session.phase, round);
+    if (!text) return; // tipo sem dica registrada — nao consome.
     consumePowerup(session.state, 'powerup-hint');
     saveState(session.state);
-    target.classList.add('hint-pulse');
-    setTimeout(() => target.classList.remove('hint-pulse'), 3000);
+    showHintHelper(text);
     renderPowerupBar();
 }
 
@@ -140,6 +178,27 @@ function useSkip() {
     session.roundIdx++;
     if (session.roundIdx >= session.rounds.length) showResult();
     else renderRound();
+}
+
+// 13.3: Tenta de novo - re-renderiza a rodada atual sem perder streak/correctCount.
+// Util quando criança quer "rebobinar" antes de errar de novo.
+function useRetry() {
+    consumePowerup(session.state, 'powerup-retry');
+    saveState(session.state);
+    renderPowerupBar();
+    // Re-renderiza a mesma rodada (DOM novo, sem clicks aplicados).
+    renderRound();
+}
+
+// 13.2: 2x Moedas como TOGGLE manual. Ja ativo? Mostra info. Senao, consome 1 e ativa.
+function useDoubleCoins() {
+    if (session.state.coinMultiplier === 2) return; // ja ativo, nao reconsome
+    if (powerupStock(session.state, 'powerup-2x') === 0) return;
+    consumePowerup(session.state, 'powerup-2x');
+    session.state.coinMultiplier = 2;
+    saveState(session.state);
+    renderPowerupBar();
+    showHintHelper('\u{1F4B0} 2x Moedas ATIVO! Acerte rapido!');
 }
 
 function renderRound() {
@@ -334,6 +393,10 @@ function showResult() {
 
         if (firstTime) state.completedPhases.push(phase.id);
         soundComplete();
+
+        // Fase 13.7: dispara effect equipado tambem na tela #result, nao so #celebration.
+        // Atrasa um pouco para os toasts de moedas/medalhas aparecerem primeiro.
+        setTimeout(() => celebrate(state), 600);
 
         // Fase 9.17: missoes diarias - completar fase / perfeita / por ilha.
         onPhaseCompleted(state, phase.id, perfect);

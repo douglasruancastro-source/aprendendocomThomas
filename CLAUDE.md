@@ -165,6 +165,30 @@ Antes do primeiro `test:e2e`: `npx playwright install`.
 - [ ] **5.17** Atualizar specs E2E (helpers sem name prompt; novos specs para badges/shop/parents/syllables) — *pendente*
 - [ ] **5.18** Commit + push final — *aguardando confirmacao do usuario*
 
+### Fase 13 — Loja funcional de verdade: powerups + cosméticos visíveis (2 ondas)
+
+**Objetivo:** corrigir 8 bugs concretos relatados pelo usuário ("powerups não funcionam" + "cosméticos não alteram nada"). Tornar cada compra com retorno visual perceptível.
+
+#### Onda 1 — Powerups que funcionam de verdade
+
+- [x] **13.1** **Dica em todas as 16 fases.** [public/js/engine.js](public/js/engine.js) `useHint()` agora tem fallback `buildHintText(phase, round)` que retorna mensagem específica por tipo: vogais ("Toque nas VOGAIS: A, E, I, O, U"), build-word ("A palavra e: BOLA"), type-word ("Digite: GATO"), memory-game ("Vire 2 cartas iguais"), syllable-build ("Junte para formar: GATO"), build-sentence ("Frase: 'O gato come'"). Nova função `showHintHelper(text)` em [public/js/renderers/feedback.js](public/js/renderers/feedback.js) exibe pílula amarela no topo por 2.8s. Powerup é consumido em ambos os caminhos (pulse OU helper) — *2026-04-26*
+- [x] **13.2** **2x Moedas vira toggle MANUAL.** Removido auto-consumo em `startActivity` ([public/js/engine.js:81-87](public/js/engine.js:81)). Adicionado 4º botão `💰` na powerup-bar ([public/index.html](public/index.html)). Click chama `useDoubleCoins()`: consome 1, seta `state.coinMultiplier = 2`, mostra hintHelper "2x Moedas ATIVO!", botão ganha classe `.active` (gradient dourado pulsante). Multiplier reseta a cada nova fase (já existia) — *2026-04-26*
+- [x] **13.3** **Tenta de Novo na powerup-bar.** Adicionado 3º botão `🔄` na barra. Click chama `useRetry()`: consome 1, re-renderiza rodada atual via `renderRound()` sem mexer em streak/correctCount. Continua disponível também no overlay de feedback (atalho rápido) — *2026-04-26*
+- [x] **13.1+** Verificação MCP: fase 1 (find-vowels) - clicar Dica caiu de 3→2 e mostrou "💡 Toque nas VOGAIS: A, E, I, O, U". Clicar 2x — multiplier 1→2, classe `.active` aplicada, hintHelper exibido — *2026-04-26*
+
+#### Onda 2 — Cosméticos com efeito visual REAL
+
+- [x] **13.4** **Tema substitui bg da screen.** [public/js/shop.js](public/js/shop.js) `applyTheme` agora seta `--screen-bg` em :root (não só `--theme-bg` que era overlay 55%). [public/css/styles.css](public/css/styles.css), [public/css/islands.css](public/css/islands.css), [public/css/design-system.css](public/css/design-system.css): `#splash`, `#islandMap`, `#menu`, `#shop`, `#celebration` ganharam `background: var(--screen-bg, /* fallback original */)`. Tema "Espaço" agora cobre todas essas telas com radial-gradient escuro real (`#1a237e → #0d0d1a`). Overlay sutil antigo mantido só em `#activity`/`#result`/`#badges` (que não tinham bg próprio fixo) com opacity reduzida pra 35% — *2026-04-26*
+- [x] **13.5** **Mascote maior + bounce no equip.** [public/css/styles.css](public/css/styles.css): mascote em telas-âncora cresceu de 64px → **100px** (110px no splash). Em mobile (≤480px) fica 80-90px. Nova classe `.just-equipped` aplicada em [public/js/renderers/mascot.js](public/js/renderers/mascot.js) `applyMascotLook` que dá bounce 0.7s ao trocar visual — *2026-04-26*
+- [x] **13.6** **Acessório destacado.** [public/js/renderers/mascot.js](public/js/renderers/mascot.js) envolve o `accessory.svg` com `<g transform="translate(-20,-12) scale(1.4)">` para coroa/óculos/chapéu ficarem visivelmente maiores na cabeça do mascote — *2026-04-26*
+- [x] **13.7** **Effect dispara no `#result` também.** [public/js/engine.js](public/js/engine.js) `showResult` chama `celebrate(state)` após 600ms quando passa de fase. Confete/fogos/estrelas/arco-íris caem **na tela de resultado**, não só em #celebration. Quem clica em "Ver meu premio!" continua vendo no celebration (efeito duplo) — *2026-04-26*
+- [x] **13.8** **Preview do frame na loja.** [public/js/renderers/shop.js](public/js/renderers/shop.js) `renderCard`: para `category: 'frame'` (não-default), substitui o ícone do preview por mini phase-card (60×60) com número "1" + estrela e a moldura aplicada via `data-frame={item.id}`. CSS `.phase-card-mini` em [public/css/design-system.css](public/css/design-system.css) com mesmas regras de halo do phase-card grande (gold/neon/holo). Criança vê **antes de comprar** como vai ficar — *2026-04-26*
+
+#### Resultado final
+
+- [x] **13.9** `npm run test` → **126/126 verde** (lógica intacta) — *2026-04-26*
+- [x] **13.10** Verificação MCP: 4 powerups funcionais (Dica/Pular/Retry/2x), tema Espaço aplicado em #islandMap visivelmente, mascote 80-100px, acessório (coroa) destacado — *2026-04-26*
+
 ### Fase 12 — Conteúdo, modo livre e polish (3 ondas)
 
 **Objetivo:** dar profundidade ao conteúdo (variação por tier dentro da ilha), oferecer modo livre de treino para crianças que querem revisar fases dominadas e polir mensagens motivacionais.

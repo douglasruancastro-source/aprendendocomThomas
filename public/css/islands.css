@@ -12,8 +12,9 @@
     --island-shadow: 0 8px 24px rgba(31, 45, 61, 0.12);
 }
 
+/* Fase 13.4: bg sobrescrivivel pelo tema da loja via --screen-bg. */
 #islandMap {
-    background: linear-gradient(180deg, #AED6F1 0%, #5DADE2 60%, #2E86C1 100%);
+    background: var(--screen-bg, linear-gradient(180deg, #AED6F1 0%, #5DADE2 60%, #2E86C1 100%));
     padding-top: 14px;
     padding-bottom: 24px;
     gap: 18px;

@@ -165,6 +165,28 @@ export function showRankUpCelebration(rank) {
     setTimeout(() => overlay.remove(), 3200);
 }
 
+// Fase 13.1: overlay temporario de dica para fases que nao tem [data-correct].
+// Posicionado fixed no topo, fecha sozinho em 2.5s.
+export function showHintHelper(text) {
+    if (!text) return;
+    let el = document.getElementById('hintHelper');
+    if (el) el.remove();
+    el = document.createElement('div');
+    el.id = 'hintHelper';
+    el.className = 'hint-helper';
+    el.setAttribute('aria-live', 'polite');
+    const ic = document.createElement('span');
+    ic.className = 'hint-helper-icon';
+    ic.textContent = '\u{1F4A1}';
+    const txt = document.createElement('span');
+    txt.className = 'hint-helper-text';
+    txt.textContent = text;
+    el.appendChild(ic);
+    el.appendChild(txt);
+    document.body.appendChild(el);
+    setTimeout(() => { if (el.parentNode) el.remove(); }, 2800);
+}
+
 // Cerimonia de ilha 100% completa (Fase 11.1).
 // Tela maior que o rank-up: mostra ilha conquistada com mascote + bonus de moedas.
 const ISLAND_MASCOT = {

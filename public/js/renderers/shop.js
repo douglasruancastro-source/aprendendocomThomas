@@ -73,10 +73,26 @@ function renderCard(entry, state, refresh) {
 
     const preview = document.createElement('div');
     preview.className = 'shop-card-preview';
-    const iconEl = document.createElement('span');
-    iconEl.className = 'shop-card-icon';
-    iconEl.textContent = item.icon;
-    preview.appendChild(iconEl);
+    // Fase 13.8: preview especial para frames - mostra mini phase-card com a moldura aplicada.
+    if (item.category === 'frame' && !item.default) {
+        const miniCard = document.createElement('div');
+        miniCard.className = 'phase-card-mini';
+        miniCard.dataset.frame = item.id;
+        const num = document.createElement('div');
+        num.className = 'phase-num-mini';
+        num.textContent = '1';
+        const star = document.createElement('span');
+        star.className = 'phase-star-mini';
+        star.textContent = '⭐';
+        miniCard.appendChild(num);
+        miniCard.appendChild(star);
+        preview.appendChild(miniCard);
+    } else {
+        const iconEl = document.createElement('span');
+        iconEl.className = 'shop-card-icon';
+        iconEl.textContent = item.icon;
+        preview.appendChild(iconEl);
+    }
     card.appendChild(preview);
 
     if (equipped) {

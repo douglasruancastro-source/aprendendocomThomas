@@ -80,18 +80,21 @@ export function equipItem(state, itemId) {
     return { ok: true, item };
 }
 
-// Aplica tema atual via CSS var --theme-bg para que TODAS as screens herdem.
-// Antes setava body.style.background, mas como cada .screen tem seu proprio bg
-// no CSS, o tema ficava invisivel. Agora as screens usam var(--theme-bg, default).
+// Fase 13.4: tema agora SUBSTITUI o bg de cada screen (via --screen-bg).
+// Antes era overlay com mix-blend-mode: 0.55 -> quase invisivel para temas claros.
+// Agora cada .screen usa `background: var(--screen-bg, /* fallback hardcoded */)`.
+// Quando ha tema ativo, --screen-bg é setado no root e cobre TUDO.
 export function applyTheme(state) {
     const themeId = (state.equipped && state.equipped.theme) || defaultItemId('theme');
     const theme = shopItemById(themeId);
     if (!theme) return;
     const root = document.documentElement;
     if (theme.bg) {
-        root.style.setProperty('--theme-bg', theme.bg);
+        root.style.setProperty('--screen-bg', theme.bg);
+        root.style.setProperty('--theme-bg', theme.bg); // mantem compat com overlay sutil
         root.dataset.themeActive = '1';
     } else {
+        root.style.removeProperty('--screen-bg');
         root.style.removeProperty('--theme-bg');
         delete root.dataset.themeActive;
     }

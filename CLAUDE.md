@@ -165,6 +165,36 @@ Antes do primeiro `test:e2e`: `npx playwright install`.
 - [ ] **5.17** Atualizar specs E2E (helpers sem name prompt; novos specs para badges/shop/parents/syllables) — *pendente*
 - [ ] **5.18** Commit + push final — *aguardando confirmacao do usuario*
 
+### Fase 14 — Mascote refeito: 2 personagens marcantes + acessórios grandes
+
+**Objetivo:** o mascote era um SVG simples (círculo amarelo + olhos + boca, ~80px). Acessórios SVG minúsculos. Criança não se identifica e cosméticos não são desejáveis. Solução: 2 personagens distintos (Dino masculino, Lumi unicórnio feminino) com SVGs ricos + escolha inicial + acessórios 2x maiores.
+
+#### Itens entregues
+
+- [x] **14.1** Schema **v6** em [public/js/state.js](public/js/state.js) com `state.mascotType: 'dino' | 'unicorn' | null`. Migração v5→v6 lossless (campo opcional, default null). Migrações encadeadas v3→v4→v5→v6 atualizadas. `tests/unit/state.test.js` ajustado pra `version: 6` — *2026-04-26*
+- [x] **14.2** [public/js/renderers/mascot.js](public/js/renderers/mascot.js) refeito completamente:
+  - **`dinoSvg(body, stroke, sparkle)`**: T-Rex amigável viewBox 100x110. Corpo verde gordinho, cabeça redonda com sorriso, **espinhos serrados nas costas** (4 polígonos), olhos brancos com pupila preta + brilho, dentinhos brancos no sorriso, bracinhos curtinhos, cauda atrás, pernas com 6 garras, bochechas rosadas opacity 0.5.
+  - **`unicornSvg(body, stroke, sparkle)`**: cavalinho branco viewBox 100x110. Corpo elíptico, **chifre dourado** com 2 listras, **crina em 3 pomponzinhos coloridos** (rosa/lilás/azul), orelhas internas rosa, **olhos com 6 cílios cada**, bochechas rosa fortes, **cauda em swoop tricolor** (3 paths sobrepostos), focinho sutil.
+  - Default colors: dino verde `#66BB6A`/`#1B5E20`, unicórnio branco `#FFFFFF`/`#9C27B0`. Cores compradas (mascot-blue/red/etc) substituem o body fill.
+  - Sparkle (mascot-gold): 3 estrelas piscantes em posições distintas.
+  - Acessório envolvido em `<g class="mascot-accessory">` injected antes de `</svg>` — *2026-04-26*
+- [x] **14.3** Nova tela `#mascotPick` em [public/index.html](public/index.html): 2 cards grandes (Dino e Lumi) com SVG preview 160x176, nome, descrição. CSS com gradient amarelo, cards com border colorido pelo tipo (verde/roxo), hover com translateY+scale 1.04, animation `float` no SVG. Mobile (≤480px): grid muda pra 1 coluna — *2026-04-26*
+- [x] **14.4** [public/js/data/shop.js](public/js/data/shop.js) — 8 acessórios redesenhados (todos 2x maiores):
+  - **Óculos Estilosos**: lentes redondas 18×14 com fill ciano translúcido, hastes 3px, brilhos brancos
+  - **Coroa Real**: zigue-zague 64px, 5 pedras coloridas (rubi central, safiras laterais, esmeraldas)
+  - **Cartola Mágica**: 56×28 preta com fita vermelha + estrela mágica brilhante na lateral
+  - **Chapéu de Festa**: cone 40×34 rosa com bolinhas amarela/azul/verde + estrela no topo
+  - **Capacete Aventureiro**: 76×38 laranja com lâmpada amarela frontal + faixa de couro
+  - **Bombacha Gauchinha**: calça verde 56×26 nas pernas com botões amarelos
+  - **Lenço Tchê**: triângulo 56×28 vermelho com bordado dourado
+  - **Chimarrão**: cuia 28×32 marrom + bomba prata 22px do lado direito — *2026-04-26*
+- [x] **14.5** [public/js/main.js](public/js/main.js) `showMascotPick()` nova função. `startBtn.onclick` agora checa `state.mascotType`: se null → mascotPick, senão → islandMap. Click em card salva tipo + chama `applyMascotLook` + vai pro mapa. Renderer `renderMascotPickPreview()` pinta os 2 SVGs nos cards — *2026-04-26*
+
+#### Resultado
+
+- [x] **14.6** `npm run test` → **126/126 verde** — *2026-04-26*
+- [x] **14.7** Verificação MCP: localStorage limpo → splash → click "Comecar" → tela #mascotPick ativa com 2 cards (Dino verde + Lumi roxo), ambos SVGs renderizados — *2026-04-26*
+
 ### Fase 13 — Loja funcional de verdade: powerups + cosméticos visíveis (2 ondas)
 
 **Objetivo:** corrigir 8 bugs concretos relatados pelo usuário ("powerups não funcionam" + "cosméticos não alteram nada"). Tornar cada compra com retorno visual perceptível.

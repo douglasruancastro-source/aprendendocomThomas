@@ -1047,6 +1047,81 @@ body.has-main-nav .screen.active {
 .feedback-overlay .retry-btn:hover { transform: translateY(-2px); }
 .feedback-overlay .retry-btn:active { transform: translateY(0) scale(0.97); }
 
+/* ===== Fase 14: tela de escolha do mascote (primeira sessao) ===== */
+#mascotPick {
+    background: linear-gradient(180deg, #FFF8E1 0%, #FFD54F 50%, #FFAB40 100%);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: var(--space-4);
+}
+.mascot-pick-title {
+    font-size: clamp(28px, 6vw, 44px);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+    text-shadow: 2px 2px 0 rgba(255, 213, 79, 0.7);
+}
+.mascot-pick-sub {
+    font-size: var(--fs-md);
+    color: var(--color-text);
+    opacity: 0.85;
+    margin: 0;
+}
+.mascot-pick-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    width: min(95vw, 600px);
+}
+@media (max-width: 480px) {
+    .mascot-pick-grid { grid-template-columns: 1fr; }
+}
+.mascot-pick-card {
+    background: white;
+    border: 5px solid var(--color-primary-dark);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3);
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: inherit;
+}
+.mascot-pick-card:hover {
+    transform: translateY(-6px) scale(1.04);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.25);
+}
+.mascot-pick-card[data-mascot-type="dino"] {
+    border-color: #43A047;
+    background: linear-gradient(180deg, white 0%, #E8F5E9 100%);
+}
+.mascot-pick-card[data-mascot-type="unicorn"] {
+    border-color: #BA68C8;
+    background: linear-gradient(180deg, white 0%, #F3E5F5 100%);
+}
+.mascot-pick-art {
+    width: 160px;
+    height: 176px;
+    animation: float 3s ease-in-out infinite;
+}
+.mascot-pick-art svg { width: 100%; height: 100%; }
+.mascot-pick-name {
+    font-size: clamp(24px, 5vw, 36px);
+    font-weight: 700;
+    color: var(--color-text);
+}
+.mascot-pick-card[data-mascot-type="dino"] .mascot-pick-name { color: #2E7D32; }
+.mascot-pick-card[data-mascot-type="unicorn"] .mascot-pick-name { color: #6A1B9A; }
+.mascot-pick-desc {
+    font-size: var(--fs-sm);
+    color: var(--color-text);
+    opacity: 0.85;
+}
+
 /* Fase 13.1: hint helper - dica textual no topo quando fase nao tem alvo unico */
 .hint-helper {
     position: fixed;

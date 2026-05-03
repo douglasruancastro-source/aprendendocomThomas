@@ -29,7 +29,9 @@ export function defaultState() {
         // v5 (Fase 10): tutorial inicial + PIN da Area dos Pais.
         hasSeenTutorial: false,
         parentsPin: null, // string de 4 digitos ou null
-        version: 5,
+        // v6 (Fase 14): tipo de mascote escolhido pela criança ('dino' | 'unicorn' | null).
+        mascotType: null,
+        version: 6,
     };
 }
 
@@ -63,32 +65,51 @@ function migrateV4toV5(v4) {
     };
 }
 
+// Migracao v5 -> v6: adiciona mascotType=null (lossless).
+// Usuarios antigos vao escolher o mascote uma vez na proxima abertura.
+function migrateV5toV6(v5) {
+    return {
+        ...v5,
+        mascotType: v5.mascotType ?? null,
+        version: 6,
+    };
+}
+
 export function loadState(storage) {
     const store = storage || (typeof localStorage !== 'undefined' ? localStorage : null);
     if (!store) return defaultState();
     try {
         const stored = JSON.parse(store.getItem(STATE_KEY));
         if (stored && stored.completedPhases) {
-            // v5 ja tem hasSeenTutorial/parentsPin
-            if (stored.version === 5) {
+            // v6 (Fase 14) ja tem mascotType
+            if (stored.version === 6) {
                 return mergeState(defaultState(), stored);
             }
-            // v4 -> v5
-            if (stored.version === 4) {
-                const migrated = mergeState(defaultState(), migrateV4toV5(stored));
+            // v5 -> v6
+            if (stored.version === 5) {
+                const migrated = mergeState(defaultState(), migrateV5toV6(stored));
                 saveState(migrated, store);
                 return migrated;
             }
-            // v3 -> v4 -> v5
+            // v4 -> v5 -> v6
+            if (stored.version === 4) {
+                const v5 = migrateV4toV5(stored);
+                const migrated = mergeState(defaultState(), migrateV5toV6(v5));
+                saveState(migrated, store);
+                return migrated;
+            }
+            // v3 -> v4 -> v5 -> v6
             if (stored.version === 3) {
                 const v4 = migrateV3toV4(stored);
-                const migrated = mergeState(defaultState(), migrateV4toV5(v4));
+                const v5 = migrateV4toV5(v4);
+                const migrated = mergeState(defaultState(), migrateV5toV6(v5));
                 saveState(migrated, store);
                 return migrated;
             }
-            // versao desconhecida — tratar como v3 (legacy mais comum)
+            // versao desconhecida — encadeia todas
             const v4 = migrateV3toV4(stored);
-            const migrated = mergeState(defaultState(), migrateV4toV5(v4));
+            const v5 = migrateV4toV5(v4);
+            const migrated = mergeState(defaultState(), migrateV5toV6(v5));
             saveState(migrated, store);
             return migrated;
         }

@@ -166,10 +166,34 @@ function showSplash() {
     showScreen('splash');
 }
 
+// Fase 14: tela de escolha do mascote (primeira sessao apenas).
+function showMascotPick() {
+    showScreen('mascotPick');
+    // Renderiza ambos SVGs (dino e unicornio) nos cards de escolha.
+    import('./renderers/mascot.js').then(({ renderMascotPickPreview }) => {
+        if (renderMascotPickPreview) renderMascotPickPreview();
+    });
+    document.querySelectorAll('.mascot-pick-card').forEach((card) => {
+        card.onclick = () => {
+            soundClick();
+            const type = card.dataset.mascotType;
+            state.mascotType = type;
+            saveState(state);
+            applyMascotLook(state);
+            showIslandMap();
+        };
+    });
+}
+
 // ===== Wiring =====
 function wire() {
     const startBtn = document.getElementById('startBtn');
-    if (startBtn) startBtn.onclick = () => { soundClick(); showIslandMap(); };
+    if (startBtn) startBtn.onclick = () => {
+        soundClick();
+        // Fase 14: primeira sessao -> escolher mascote antes do mapa.
+        if (!state.mascotType) showMascotPick();
+        else showIslandMap();
+    };
 
     const parentsBtn = document.getElementById('parentsBtn');
     if (parentsBtn) parentsBtn.onclick = () => { soundClick(); showParents(); };

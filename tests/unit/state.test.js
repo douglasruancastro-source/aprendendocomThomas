@@ -15,7 +15,7 @@ describe('defaultState', () => {
         const s = defaultState();
         ['completedPhases','drawingsUsed','badges','streak','bestStreak','totalCorrect',
          'coins','totalCoinsEarned','ownedItems','equipped','lastPlayDay','dailyStreak',
-         'recentRounds','phaseStats','phaseStars','hasSeenTutorial','parentsPin','version'].forEach((k) => {
+         'recentRounds','phaseStats','phaseStars','hasSeenTutorial','parentsPin','mascotType','version'].forEach((k) => {
             expect(s).toHaveProperty(k);
         });
     });
@@ -31,7 +31,7 @@ describe('defaultState', () => {
         expect(s.phaseStars).toEqual({});
         expect(s.hasSeenTutorial).toBe(false);
         expect(s.parentsPin).toBeNull();
-        expect(s.version).toBe(5);
+        expect(s.version).toBe(6);
     });
 
     it('equipped has defaults per category', () => {
@@ -76,7 +76,7 @@ describe('loadState', () => {
         delete v3.parentsPin;
         localStorage.setItem(STATE_KEY, JSON.stringify(v3));
         const s = loadState();
-        expect(s.version).toBe(5);
+        expect(s.version).toBe(6);
         expect(s.phaseStars[1]).toBe(1);
         expect(s.phaseStars[2]).toBe(1);
         expect(s.phaseStars[3]).toBe(1);
@@ -91,7 +91,7 @@ describe('loadState', () => {
         delete v4.parentsPin;
         localStorage.setItem(STATE_KEY, JSON.stringify(v4));
         const s = loadState();
-        expect(s.version).toBe(5);
+        expect(s.version).toBe(6);
         expect(s.completedPhases).toEqual([1, 2]);
         expect(s.coins).toBe(200);
         expect(s.phaseStars).toEqual({ 1: 2 });

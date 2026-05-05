@@ -162,7 +162,7 @@ Antes do primeiro `test:e2e`: `npx playwright install`.
 - [x] **5.14** Reposicionar 4 hotspots existentes (letras top 38%, numeros top 28%) para nao colidir com balao — *2026-04-24*
 - [x] **5.15** Estados visuais do .phase-card: data-state="locked|available|completed", overlay 🔒, animacao pulse no available — *2026-04-24*
 - [x] **5.16** `npm test` 122/122 verde + verificacao via preview MCP (splash sem name prompt, 5 ilhas, syllable-build funcional, badges/parents acessiveis pela main-nav, mobile 375x812 sem overflow) — *2026-04-24*
-- [ ] **5.17** Atualizar specs E2E (helpers sem name prompt; novos specs para badges/shop/parents/syllables) — *pendente*
+- [x] **5.17** Atualizar specs E2E (helpers sem name prompt; novos specs para badges/shop/parents/syllables) — resolvido na Fase 16 Onda 9 — *2026-05-04*
 - [ ] **5.18** Commit + push final — *aguardando confirmacao do usuario*
 
 ### Fase 14 — Mascote refeito: 2 personagens marcantes + acessórios grandes
@@ -441,6 +441,74 @@ Antes do primeiro `test:e2e`: `npx playwright install`.
 - [x] **D.4** [public/js/renderers/menu.js](public/js/renderers/menu.js) usa `ISLANDS` para filtro/ranges; `islandMap.js` roteia hotspot rewards → Ilha do Tesouro (em vez de loja) — *2026-04-25*
 - [x] **D.5** Tests atualizados (75 fases) — 125/125 verde — *2026-04-25*
 
+### Fase 16 — Refactor UI/UX global (10 ondas)
+
+**Objetivo:** consolidar a UI em um sistema de design coerente. Antes do refactor, conviviam dois sistemas de tokens (legacy RS bandeira + paleta v2 "infantil"), backgrounds gradient distintos por tela, listra tricolor RS no topo do menu, 3 inline-styles em botões, classes duplicadas (`.btn-primary`, `.shop-card`, `.parents-card`), CSS órfão (#namePrompt, badges legacy) e bugs latentes (títulos vermelhos sobrepondo island headers, mascote 55px em mobile sobrescrevendo design 80px). Refactor faseado em 10 ondas, cada uma com aprovação humana antes da próxima.
+
+#### Ondas entregues
+
+- [x] **16.1** Tokens canônicos v3 em [public/css/design-system.css](public/css/design-system.css): `--c-*` (4 marcas + superfícies + ink + estados + ilhas), `--s-1..8`, `--r-sm/md/lg/xl/pill`, `--sh-sm/md/lg/halo-*`, `--t-display/h1/h2/body-l/body/caption` com clamp(), `--d-fast/base/slow`, `--ease/-bounce`, `--z-base/mascot/fixed/nav/overlay/modal/toast`, `--tap-min: 48px`. Tokens v2 viraram aliases. `--z-nav` e `--z-overlay` legacy preservados nos valores antigos (override sobre canônicos) para zero mudança de stacking — *2026-05-04*
+
+- [x] **16.2** Layout primitive: `.screen-header`, `.screen-body`, `.screen-footer` + variantes `.screen--hero/.screen--app/.screen--game` + helpers `.screen-header__title`, `.screen-header--island`. Aditivo, opt-in. Nenhuma tela migrada (deferido) — *2026-05-04*
+
+- [x] **16.3** Botões unificados (BEM): `.btn--primary/secondary/ghost/danger`, `.btn--sm/lg`, helpers `.btn__icon/.btn__label`. Cada variante autocontida (não depende de classe `.btn` base) para evitar colisão com legacy. `min-height: var(--tap-min)`, focus-visible ciano, estados hover/active/disabled — *2026-05-04*
+
+- [x] **16.4** Cards unificados: variantes `.card--interactive/bare/compact/elevated`; estados `.card[data-state="locked|completed|available|equipped"]`; raridades `.card--rarity-common/rare/epic/legendary`; frames `.card--frame-gold/neon/holo`; helpers `.card__media/title/subtitle/meta/actions/seal`. Keyframes prefixados (`cardAvailablePulse`, `cardRarePulse`, etc.) para não colidir com os legacy — *2026-05-04*
+
+- [x] **16.5.1** `#splash`: bg gradient azul animado (`#C8E6F5 → #82C8E5 → #4FA3CF` + `gradientBG 14s`) → cream sólido `var(--c-surface-app)`. Tagline branco com sombra escura → `--c-ink`. Link "Área dos pais" branco semi-transparente → `--c-ink-soft` — *2026-05-04*
+
+- [x] **16.5.2** `#mascotPick`: bg gradient amarelo/laranja → cream. Sombra amarela do título removida (perdia função). Cards Dino (verde) e Lumi (roxo) preservados intactos como identidade — *2026-05-04*
+
+- [x] **16.5.3** `#menu`: gradient amarelo→verde RS removido; **listra tricolor RS de 12px no topo eliminada**; regra `#menu h2` legacy removida (sobrescrevia `.menu-island-title` por especificidade 0,1,1, **pintando o título da ilha de vermelho `#B71C1C` em vez do branco previsto pelo `.menu-island-header`**). Bug visual presente desde Fase 5 corrigido — *2026-05-04*
+
+- [x] **16.5.4** `#shop`: gradient amarelo eliminado; regra `#shop h2` legacy removida (mesmo bug do menu — pintava `.shop-screen-title` de vermelho RS). `padding-top: 80px` mantido para clearance do HUD fixed — *2026-05-04*
+
+- [x] **16.5.5** `#badges`: `.screen-title` (compartilhada com `#parents`) modernizada para tokens canônicos: `var(--t-h1)` clamp(24,5vw,36) em vez de `--fs-lg` 28px fixo; margens em `var(--s-3)/--s-4`; line-height 1.15 — *2026-05-04*
+
+- [x] **16.5.6** `#parents`: bloco `.parents-card` placeholder duplicado removido (Fase 5.7 vs Fase 10.3); regra `.parents-card p` (única exclusiva do placeholder) preservada e modernizada (`color: #555` → `var(--c-ink-soft)`, `margin: 0` adicionado) — *2026-05-04*
+
+- [x] **16.5.7** `#activity`: `padding-top: 80px → 64px` (16px de altura útil ganha para conteúdo da rodada, ainda clears HUD fixed top-right + btn-home top-left); `gap: 20px → var(--s-4)` (16px). Remoção total do padding-top depende de Onda 6 (HUD adaptativo) — *2026-05-04*
+
+- [x] **16.5.8** `#result`: tokens canônicos clamp() em emoji/h2/msg/score; `.result-msg color #555 → var(--c-ink-soft)`; **inline-style `style="display:flex;gap:14px;..."` do `#resultButtons` substituído por classe `.result-actions`** — *2026-05-04*
+
+- [x] **16.5.9** `#celebration`: gradient RS bandeira animado (`#E53935 → #FFEB3B → #2E7D32` + `gradientBG 6s`) → cream. h2 branco com sombra RS vermelha+verde → `--c-ink` com sombra dourada sutil. **2 inline-styles dos botões eliminados** (`#celebPdfBtn` ganha classe `.celeb-pdf-btn` com gradient festivo amarelo→âmbar→laranja na paleta v3; `#celebMenuBtn` ganha `.celeb-menu-btn`). Energia visual da tela agora vem das animações (confete, fogos, arco-íris) — *2026-05-04*
+
+- [x] **16.6** Mascote consolidado: 5 blocos de regras espalhados (`body[data-screen="splash|menu|badges|parents|shop|islandMap"] #mascot`) → 3 blocos semânticos (base + override splash + override islandMap). Definição de `#mascot.idle` reduzida de 7 ocorrências para 1 (`float 3.5s`). Comportamento preservado em splash/menu/badges/shop/parents/islandMap; `#activity` e `#celebration` agora recebem a base 100×100 em vez do fallback antigo 70×70. **Parte do HUD adaptativo deferida** (depende de telas migradas para `.screen--app`) — *2026-05-04*
+
+- [x] **16.7** Overlays unificados (BEM): `.overlay` + `.overlay--feedback/tutorial/celebration/island-complete` + `.overlay__card` + `.overlay__card--feedback/tutorial/celebration/island-complete` + helpers `.overlay__emoji/title/message/actions`. Reaproveita keyframes existentes (`fadeIn`, `pop`, `rankupZoom`). Migração JS deferida (`.feedback-overlay/.tutorial-overlay/.rankup-overlay/.island-completion-overlay` continuam intactos, criados via classNames em [public/js/renderers/feedback.js](public/js/renderers/feedback.js) e [public/js/components/Tutorial.js](public/js/components/Tutorial.js)) — *2026-05-04*
+
+- [x] **16.8** Limpeza: removidos `#namePrompt` + `.name-prompt-*` + `#nameInput` (~67 linhas, órfãos desde Fase 5.3); legacy badges `.badges-section/badge-item/badge-icon/badge-name` (~57 linhas, substituídos por `.badges-grid-large`+`.badge-card` na Fase 6); keyframe `@keyframes gradientBG` (órfão pós-Ondas 5.1/5.3/5.9); 15 tokens órfãos (`--rs-yellow`, `--rs-green-light`, `--rs-sky`, `--phase1..12`). **Bug latente corrigido**: regra `@media (max-width: 600px) #mascot { width: 55px; right: 50px }` sobrescrevia silenciosamente a regra mobile `@media (max-width: 480px) #mascot { width: 80px }` da Onda 6 por source order — em mobile o mascote estava 55px em vez dos 80px planejados — *2026-05-04*
+
+- [x] **16.9** Specs E2E: 35/35 verde. Auditoria confirmou zero seletor estrutural mudou (todos IDs/data-attrs/classes preservados); única falha em [tests/e2e/island-map.spec.js](tests/e2e/island-map.spec.js) era fragilidade pré-existente (5º card "rewards" coberto por `.home-cta-bar` no viewport Playwright 1280×720) — corrigida com `page.evaluate(() => element.click())` que dispara handler JS direto. Pendência 5.17 da CLAUDE.md resolvida — *2026-05-04*
+
+- [x] **16.10** A11y polish: focus-visible universal (`button:focus-visible, [role="button"]:focus-visible, a:focus-visible { outline: 3px solid var(--c-secondary); outline-offset: 3px; }`) cobrindo `.btn-back`, `.btn-secondary`, `.menu-train-btn`, `.main-nav button`, `.tab-btn`, `.pager-btn`, `.shop-card-action`, `.feedback-overlay .retry-btn`, `.tutorial-next/skip`, `.parents-danger-btn`, `.island-completion-close`. Tap targets bumped: `.btn-back`, `.menu-train-btn`, `.parents-danger-btn`, `.tutorial-next` → 44px (WCAG AA); `.island-completion-close` → 48px (Material). Reduced-motion já tinha guard global `*` (preserva animações das ondas 2-7 automaticamente) — *2026-05-04*
+
+#### Resultado final
+
+- [x] **16.11** `npm run test` → **126/126 unit verde** + `npx playwright test` → **35/35 e2e verde** = **161/161 testes verdes** — *2026-05-04*
+
+#### Saldo do refactor
+
+- **+605 linhas** de novo sistema canônico (tokens v3, primitivo de layout, sistema BEM de botões/cards/overlays, polish a11y).
+- **-220 linhas** de código órfão removido.
+- **3 inline-styles eliminados** (`#resultButtons`, `#celebPdfBtn`, `#celebMenuBtn`).
+- **4 backgrounds gradient eliminados** (`#splash`, `#mascotPick`, `#shop`, `#celebration`).
+- **1 listra tricolor RS removida** do topo do `#menu`.
+- **3 bugs latentes corrigidos**: títulos vermelhos sobrescrevendo `.menu-island-title` e `.shop-screen-title`; mascote mobile 55px (deveria ser 80px).
+- **15 tokens CSS órfãos** removidos.
+- **0 regressões** em 161 testes.
+
+#### Trabalho deferido (Onda 11 — Migração estrutural)
+
+Sistema canônico está pronto mas **nenhuma tela ainda usa as classes novas no HTML**. Para uma onda futura quando o HTML/JS for migrado em pacote único:
+
+1. Telas → `.screen--app/.screen--hero/.screen--game` no HTML.
+2. HUD → entra no `.screen-header` em telas `.screen--app` (sai do `position: fixed`).
+3. Botões legacy (`.btn`, `.btn-primary`, `.btn-secondary`, `.btn-back`, `.btn-home`) → `.btn--*`.
+4. Cards legacy (`.shop-card`, `.badge-card`, `.parents-card`, `.phase-card`, `.island-card`, `.mascot-pick-card`) → `.card` + variantes.
+5. Overlays legacy (`.feedback-overlay`, `.tutorial-overlay`, `.rankup-overlay`, `.island-completion-overlay`) → `.overlay` + variantes — requer ajuste em [feedback.js](public/js/renderers/feedback.js) e [Tutorial.js](public/js/components/Tutorial.js).
+6. Renomear `.home-strip/.home-hero/.home-cta-bar` → `.screen-header/.screen-body/.screen-footer` no `#islandMap`.
+
 ---
 
 ## 6. Pendências / pontos de atenção (não-bloqueantes)
@@ -456,10 +524,14 @@ Antes do primeiro `test:e2e`: `npx playwright install`.
 
 ---
 
-**Última atualização:** 2026-04-25 — Fase 6 (4 ondas) entregue:
-  • **Onda A:** zero scroll vertical em 100dvh; Pager genérico; menu/medalhas/loja paginados; tokens de espaçamento e tipografia.
-  • **Onda B:** Tabs genérico; loja com 4 tabs + grid 2 col paginado + cards grandes; medalhas com raridade (common/rare/epic/legendary) em tabs.
-  • **Onda C:** schema v4 com `phaseStars`; engine calcula 1-3⭐ por fase via `percent`; LevelCard mostra estrelas; tela de result com estrelas animadas. Migração v3→v4 lossless.
-  • **Onda D:** 5 ilhas em [data/islands.js](public/js/data/islands.js); 75 fases (5×15) em [data/phases.js](public/js/data/phases.js); `rounds.js` mapeia `phase.type → pool` automaticamente. Hotspot "rewards" passa a abrir Ilha do Tesouro.
-  
-  **125/125 unit tests verdes.** Verificação via preview MCP em 360x640, 375x812, 768x1024 — todas as telas dimensionadas em altura exata, sem overflow horizontal.
+**Última atualização:** 2026-05-04 — Fase 16 (10 ondas) entregue: refactor UI/UX global.
+
+  • **Ondas 1-4 (fundação):** tokens canônicos v3, layout primitive `.screen--*`, sistema BEM de botões `.btn--*` e cards `.card--*`. Aditivo, sem mudança visual.
+  • **Ondas 5.1-5.9 (telas individuais):** 9 telas modernizadas. 4 backgrounds gradient eliminados (splash, mascotPick, shop, celebration), 1 listra tricolor RS removida (menu), 3 inline-styles eliminados (#resultButtons, #celebPdfBtn, #celebMenuBtn), 2 bugs latentes corrigidos (títulos `.menu-island-title` e `.shop-screen-title` que apareciam vermelhos por especificidade legacy).
+  • **Onda 6 (mascote):** 5 blocos de regras posicionais consolidados em 3 (base + override splash + override islandMap). Bug latente corrigido (mascote mobile 55px → 80px conforme planejado).
+  • **Onda 7 (overlays):** sistema canônico `.overlay`/`.overlay__card` + 4 variantes (feedback/tutorial/celebration/island-complete). Migração JS deferida.
+  • **Onda 8 (limpeza):** -220 linhas de código órfão removidas (#namePrompt + name-prompt-*, badges legacy, gradientBG keyframe, 15 tokens —phase1..12 + rs-yellow/green-light/sky).
+  • **Onda 9 (E2E):** 35/35 specs verde. Pendência 5.17 da Fase 5 resolvida.
+  • **Onda 10 (a11y):** focus-visible universal + tap targets bumped pra WCAG AA.
+
+  **161/161 testes verdes** (126 unit + 35 e2e). **+605 linhas** de novo sistema canônico, **-220 linhas** órfãs, **0 regressões**. Sistema canônico pronto para adoção HTML/JS em uma futura "Onda 11 — migração estrutural".

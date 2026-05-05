@@ -88,6 +88,8 @@ function showIslandMap() {
         state,
         onPickSection: (section) => showMenu(section),
         onOpenShop: showShop,
+        // Fase 15: CTA "Continuar" -> proxima fase desbloqueada (ou no-op se completo).
+        onContinue: (phase) => { if (phase) startActivity(phase.id); },
     });
     // Fase 9.17: card de missoes diarias.
     renderMissionsCard(state, (reward) => {

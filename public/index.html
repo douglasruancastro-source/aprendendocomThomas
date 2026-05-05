@@ -30,14 +30,23 @@
     </div>
 </div>
 
-<!-- SPLASH SCREEN -->
+<!-- SPLASH SCREEN (Fase 15: 2 colunas em tablet+, CTA forte unica) -->
 <div id="splash" class="screen">
-    <img src="assets/brand/logo-mundo-tres-ilhas.jpg" alt="Mundo das Tres Ilhas" class="splash-brand">
-    <img src="assets/mascots/mascotes-grupo.jpg" alt="Tomi, Ro e Livi" class="splash-mascots">
-    <div class="subtitle" id="splashSubtitle">Oi guri! Vamos aprender brincando?</div>
-    <div class="splash-actions">
-        <button class="btn-primary" id="startBtn">Comecar</button>
-        <button class="btn-secondary" id="parentsBtn">Area dos pais</button>
+    <div class="splash-stage">
+        <div class="splash-copy">
+            <img src="assets/brand/logo-mundo-tres-ilhas.jpg" alt="Mundo das Tres Ilhas" class="splash-brand">
+            <p class="splash-tagline" id="splashSubtitle">Oi guri! Vamos aprender brincando nas Tres Ilhas?</p>
+            <div class="splash-actions">
+                <button class="splash-cta" id="startBtn" type="button">
+                    <span class="splash-cta-icon" aria-hidden="true">&#x1F334;</span>
+                    <span class="splash-cta-text">Comecar a aventura</span>
+                </button>
+                <button class="splash-link" id="parentsBtn" type="button">Area dos pais</button>
+            </div>
+        </div>
+        <div class="splash-art" aria-hidden="true">
+            <img src="assets/mascots/mascotes-grupo.jpg" alt="" class="splash-mascots">
+        </div>
     </div>
 </div>
 
@@ -59,46 +68,116 @@
     </div>
 </div>
 
-<!-- ISLAND MAP SCREEN -->
+<!-- ISLAND MAP SCREEN (home redesenhada — Fase 15) -->
 <div id="islandMap" class="screen">
-    <header class="map-header">
-        <img src="assets/brand/logo-mundo-tres-ilhas.jpg" alt="Mundo das Tres Ilhas" class="map-logo">
-    </header>
-    <div class="map-canvas">
-        <img src="assets/maps/mapa-ilhas-home.jpg" alt="" class="map-bg">
-        <!-- Fase 7: ambiente animado por ilha (sem pointer events, decorativo) -->
-        <div class="map-ambient" aria-hidden="true">
-            <span class="ambient-particle leaf l1">&#x1F343;</span>
-            <span class="ambient-particle leaf l2">&#x1F343;</span>
-            <span class="ambient-particle leaf l3">&#x1F33F;</span>
-            <span class="ambient-particle cloud c1">&#x2601;&#xFE0F;</span>
-            <span class="ambient-particle cloud c2">&#x2601;&#xFE0F;</span>
-            <span class="ambient-particle sparkle-city s1">&#x2728;</span>
-            <span class="ambient-particle sparkle-city s2">&#x2728;</span>
-            <span class="ambient-particle rainbow-bit r1">&#x1F308;</span>
-            <span class="ambient-particle treasure-glow t1">&#x2728;</span>
-            <span class="ambient-particle treasure-glow t2">&#x1F4AB;</span>
+    <!-- Zona A: top strip (brand + progresso global) -->
+    <header class="home-strip" aria-label="Resumo do progresso">
+        <div class="home-brand">
+            <span class="home-brand-mark" aria-hidden="true">&#x1F3DD;&#xFE0F;</span>
+            <span class="home-brand-word">EducaTche</span>
         </div>
-        <button class="island-hotspot island-letters" data-section="letters" type="button" aria-label="Ilha das Letras com Tomi">
-            <img src="assets/mascots/tomi-capivara.jpg" alt="" class="island-mascot">
-            <span class="island-label">Letras</span>
-        </button>
-        <button class="island-hotspot island-numbers" data-section="numbers" type="button" aria-label="Ilha dos Numeros com Ro">
-            <img src="assets/mascots/ro-macaco.jpg" alt="" class="island-mascot">
-            <span class="island-label">Numeros</span>
-        </button>
-        <button class="island-hotspot island-colors" data-section="colors" type="button" aria-label="Ilha das Cores com Livi">
-            <img src="assets/mascots/livi-arara.jpg" alt="" class="island-mascot">
-            <span class="island-label">Cores</span>
-        </button>
-        <button class="island-hotspot island-rewards" data-section="rewards" type="button" aria-label="Ilha do Tesouro">
-            <span class="island-emoji" aria-hidden="true">&#x1F48E;</span>
-            <span class="island-label">Tesouro</span>
-        </button>
-        <button class="island-hotspot island-syllables" data-section="syllables" type="button" aria-label="Balao das Silabas">
-            <span class="island-emoji island-balloon" aria-hidden="true">&#x1F388;</span>
-            <span class="island-mascot-emoji" aria-hidden="true">&#x1F99C;</span>
-            <span class="island-label">Silabas</span>
+        <div class="home-progress" id="homeProgress" aria-label="Progresso global">
+            <span class="home-progress-icon" aria-hidden="true">&#x2B50;</span>
+            <span class="home-progress-text" id="homeProgressText">0/75</span>
+            <span class="home-progress-streak" id="homeProgressStreak" hidden>
+                <span aria-hidden="true">&#x1F525;</span>
+                <span id="homeStreakCount">0</span>
+            </span>
+        </div>
+    </header>
+
+    <!-- Zona B: hero com missoes + grid de ilhas -->
+    <main class="home-hero">
+        <div class="home-hero-inner">
+            <div class="home-hero-decor" aria-hidden="true">
+                <img src="assets/maps/mapa-ilhas-home.jpg" alt="" class="home-hero-bg">
+                <div class="map-ambient">
+                    <span class="ambient-particle leaf l1">&#x1F343;</span>
+                    <span class="ambient-particle leaf l2">&#x1F343;</span>
+                    <span class="ambient-particle leaf l3">&#x1F33F;</span>
+                    <span class="ambient-particle cloud c1">&#x2601;&#xFE0F;</span>
+                    <span class="ambient-particle cloud c2">&#x2601;&#xFE0F;</span>
+                    <span class="ambient-particle sparkle-city s1">&#x2728;</span>
+                    <span class="ambient-particle sparkle-city s2">&#x2728;</span>
+                    <span class="ambient-particle rainbow-bit r1">&#x1F308;</span>
+                    <span class="ambient-particle treasure-glow t1">&#x2728;</span>
+                    <span class="ambient-particle treasure-glow t2">&#x1F4AB;</span>
+                </div>
+            </div>
+
+            <div class="home-hero-content">
+                <div class="home-missions-slot" data-slot="missions"></div>
+
+                <div class="islands-grid" role="list" aria-label="Ilhas">
+                    <button class="island-card island-letters" data-section="letters" data-island="forest" type="button" role="listitem" aria-label="Ilha das Letras com Tomi">
+                        <span class="island-card-art">
+                            <img src="assets/mascots/tomi-capivara.jpg" alt="" class="island-mascot">
+                        </span>
+                        <span class="island-card-body">
+                            <span class="island-card-title">Letras</span>
+                            <span class="island-card-sub">com Tomi</span>
+                            <span class="island-card-bar"><span class="island-card-bar-fill" style="width:0%"></span></span>
+                            <span class="island-card-meta"><span class="island-card-progress">0/15</span> fases</span>
+                        </span>
+                    </button>
+                    <button class="island-card island-numbers" data-section="numbers" data-island="city" type="button" role="listitem" aria-label="Ilha dos Numeros com Ro">
+                        <span class="island-card-art">
+                            <img src="assets/mascots/ro-macaco.jpg" alt="" class="island-mascot">
+                        </span>
+                        <span class="island-card-body">
+                            <span class="island-card-title">Numeros</span>
+                            <span class="island-card-sub">com Ro</span>
+                            <span class="island-card-bar"><span class="island-card-bar-fill" style="width:0%"></span></span>
+                            <span class="island-card-meta"><span class="island-card-progress">0/15</span> fases</span>
+                        </span>
+                    </button>
+                    <button class="island-card island-colors" data-section="colors" data-island="rainbow" type="button" role="listitem" aria-label="Ilha das Cores com Livi">
+                        <span class="island-card-art">
+                            <img src="assets/mascots/livi-arara.jpg" alt="" class="island-mascot">
+                        </span>
+                        <span class="island-card-body">
+                            <span class="island-card-title">Cores</span>
+                            <span class="island-card-sub">com Livi</span>
+                            <span class="island-card-bar"><span class="island-card-bar-fill" style="width:0%"></span></span>
+                            <span class="island-card-meta"><span class="island-card-progress">0/15</span> fases</span>
+                        </span>
+                    </button>
+                    <button class="island-card island-syllables" data-section="syllables" data-island="clouds" type="button" role="listitem" aria-label="Ilha das Silabas">
+                        <span class="island-card-art island-card-art-emoji">
+                            <span class="island-emoji island-balloon" aria-hidden="true">&#x1F388;</span>
+                            <span class="island-mascot-emoji" aria-hidden="true">&#x1F99C;</span>
+                        </span>
+                        <span class="island-card-body">
+                            <span class="island-card-title">Silabas</span>
+                            <span class="island-card-sub">no balao</span>
+                            <span class="island-card-bar"><span class="island-card-bar-fill" style="width:0%"></span></span>
+                            <span class="island-card-meta"><span class="island-card-progress">0/15</span> fases</span>
+                        </span>
+                    </button>
+                    <button class="island-card island-rewards" data-section="rewards" data-island="treasure" type="button" role="listitem" aria-label="Ilha do Tesouro">
+                        <span class="island-card-art island-card-art-emoji">
+                            <span class="island-emoji" aria-hidden="true">&#x1F48E;</span>
+                        </span>
+                        <span class="island-card-body">
+                            <span class="island-card-title">Tesouro</span>
+                            <span class="island-card-sub">desafios</span>
+                            <span class="island-card-bar"><span class="island-card-bar-fill" style="width:0%"></span></span>
+                            <span class="island-card-meta"><span class="island-card-progress">0/15</span> fases</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Zona C: CTA "Continuar" + main-nav -->
+    <div class="home-cta-bar">
+        <button class="home-cta" id="continueBtn" type="button">
+            <span class="home-cta-arrow" aria-hidden="true">&#x25B6;</span>
+            <span class="home-cta-text">
+                <span class="home-cta-label">Continuar</span>
+                <span class="home-cta-sub" id="continueLabel">Comece a aventura!</span>
+            </span>
         </button>
     </div>
 </div>
@@ -182,19 +261,15 @@
     <h2 id="resultTitle"></h2>
     <div class="result-msg" id="resultMsg"></div>
     <div class="result-score" id="resultScore"></div>
-    <div id="resultButtons" style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;"></div>
+    <div id="resultButtons" class="result-actions"></div>
 </div>
 
 <!-- CELEBRATION SCREEN -->
 <div id="celebration" class="screen">
     <h2 id="celebTitle"></h2>
     <div class="sub" id="celebSub"></div>
-    <button class="btn" id="celebPdfBtn" style="background:linear-gradient(135deg,#E53935,#FFEB3B);color:#3a2a00;font-size:32px;">
-        Ganhe seu Premio!
-    </button>
-    <button class="btn btn-primary" id="celebMenuBtn" style="font-size:24px;">
-        Voltar ao Menu
-    </button>
+    <button class="btn celeb-pdf-btn" id="celebPdfBtn">Ganhe seu Premio!</button>
+    <button class="btn btn-primary celeb-menu-btn" id="celebMenuBtn">Voltar ao Menu</button>
 </div>
 
 <!-- FEEDBACK OVERLAY -->

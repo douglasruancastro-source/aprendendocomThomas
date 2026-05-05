@@ -1,29 +1,22 @@
 :root {
-    /* Cores da bandeira do Rio Grande do Sul */
-    --rs-red: #E53935;
-    --rs-yellow: #FFEB3B;
-    --rs-green: #2E7D32;
-    --rs-green-light: #66BB6A;
-    --rs-red-dark: #B71C1C;
-    --rs-sky: #FFF8E1;
+    /* Tokens legacy ainda em uso. Os --c-*/--s-*/--r-*/--sh-*/--t-*
+       canonicos vivem em design-system.css; aqui restam apenas os
+       tokens v1 que ainda sao referenciados por estilos de atividades
+       (math/colors/numbers) e pelo body. Onda 8 removeu 15 tokens
+       orfaos: --rs-yellow, --rs-green-light, --rs-sky, --phase1..12. */
 
+    /* Cores da bandeira do RS — usadas em fases de matematica
+       (.number-big, .math-op, .math-equation). */
+    --rs-red:      #E53935;
+    --rs-green:    #2E7D32;
+    --rs-red-dark: #B71C1C;
+
+    /* Tokens base — body, word-slot filled, engine inline (resultScore). */
     --primary: var(--rs-green);
-    --bg: #FFF8E1;
-    --text: #333;
+    --bg:      #FFF8E1;
+    --text:    #333;
     --correct: #2E7D32;
-    --wrong: #FFA726;
-    --phase1: #E53935;
-    --phase2: #2E7D32;
-    --phase3: #FDD835;
-    --phase4: #FFA726;
-    --phase5: #AB47BC;
-    --phase6: #26A69A;
-    --phase7: #5C6BC0;
-    --phase8: #EC407A;
-    --phase9: #FF8A65;
-    --phase10: #7E57C2;
-    --phase11: #29B6F6;
-    --phase12: #8D6E63;
+    --wrong:   #FFA726;
 }
 
 * {
@@ -214,122 +207,29 @@ body.streak-hot #activity {
 
 body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
 
-/* ===== NAME PROMPT ===== */
-#namePrompt {
-    background: linear-gradient(135deg, #E53935 0%, #E53935 33%, #FFEB3B 33%, #FFEB3B 66%, #2E7D32 66%, #2E7D32 100%);
-    background-size: 200% 200%;
-    animation: gradientBG 10s ease infinite;
+/* Bloco #namePrompt + .name-prompt-* + #nameInput removido na Onda 8
+   (limpeza). HTML correspondente foi excluido na Fase 5.3 (splash sem
+   prompt de nome); CSS estava orfao desde entao. ~70 linhas eliminadas. */
+
+/* ===== SPLASH (Onda 5.1 do refactor: bg neutro, sem gradient animado) =====
+   Tema da loja continua sobrescrevendo via --screen-bg.
+   Identidade visual passa a vir da arte central (logo+mascotes) e do CTA ambar,
+   nao mais de um background azul gritante. */
+#splash {
+    background: var(--screen-bg, var(--c-surface-app));
     justify-content: center;
     align-items: center;
-    padding: 20px;
-}
-
-.name-prompt-box {
-    background: white;
-    border-radius: 28px;
-    padding: 32px 28px;
-    max-width: 440px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-    border: 5px solid #FFEB3B;
-    animation: pop 0.5s ease;
-}
-
-.name-prompt-box h1 {
-    font-size: 40px;
-    color: #B71C1C;
-    margin-bottom: 8px;
-    text-shadow: 2px 2px 0 rgba(255,235,59,0.6);
-}
-
-.name-prompt-sub {
-    font-size: 26px;
-    color: #2E7D32;
-    font-weight: 700;
-    margin-bottom: 18px;
-}
-
-.name-prompt-mate {
-    width: 110px;
-    height: 130px;
-    margin: 0 auto 12px;
-    animation: float 3s ease-in-out infinite;
-}
-
-.name-prompt-mate svg { width: 100%; height: 100%; }
-
-#nameInput {
-    width: 100%;
-    max-width: 320px;
-    padding: 16px 18px;
-    font-family: inherit;
-    font-size: 28px;
-    font-weight: 700;
-    text-align: center;
-    border: 3px solid #E53935;
-    border-radius: 16px;
-    margin-bottom: 18px;
-    color: #333;
-    outline: none;
-    text-transform: uppercase;
-    background: #FFF8E1;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-#nameInput:focus {
-    border-color: #2E7D32;
-    box-shadow: 0 0 0 4px rgba(46,125,50,0.2);
-}
-
-/* ===== SPLASH ===== */
-/* Fase 8: gradient azul-ceu igual ao do #islandMap (substituiu cores RS).
-   Fase 13.4: tema da loja sobrescreve via --screen-bg. */
-#splash {
-    background: var(--screen-bg, linear-gradient(180deg, #AED6F1 0%, #5DADE2 55%, #2E86C1 100%));
-    background-size: 100% 200%;
-    animation: gradientBG 12s ease infinite;
-    justify-content: center;
-    gap: 20px;
+    gap: 0;
     position: relative;
 }
 
-.splash-logo {
-    width: 220px;
-    height: 220px;
-    animation: float 3s ease-in-out infinite;
-    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.35));
-}
+/* Keyframe @keyframes gradientBG removido na Onda 8: usuarios eram
+   #splash, #menu, #celebration, #namePrompt — todos migrados para
+   bg neutro nas Ondas 5.x ou removidos. */
 
+/* Logo svg legacy (caso seja reaproveitada algum dia) */
+.splash-logo { width: 220px; height: 220px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.35)); }
 .splash-logo svg { width: 100%; height: 100%; display: block; }
-
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-#splash h1 {
-    font-size: 60px;
-    font-weight: 700;
-    color: white;
-    text-align: center;
-    /* Fase 8: text-shadow azul (substituiu vermelho/verde RS) */
-    text-shadow: 3px 3px 0 #1565C0, -1px -1px 0 #2E86C1, 4px 4px 8px rgba(0,0,0,0.35);
-    animation: float 3s ease-in-out infinite;
-    letter-spacing: 1px;
-}
-
-#splash .subtitle {
-    font-size: 28px;
-    color: #FFFFFF;
-    text-align: center;
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-    /* Fase 8: subtitle bg azul translucent (substituiu vermelho RS) */
-    background: rgba(46, 134, 193, 0.55);
-    padding: 8px 16px;
-    border-radius: 14px;
-}
 
 .btn {
     display: inline-flex;
@@ -426,32 +326,20 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
 
 .coin-toast .coin-toast-breakdown div { line-height: 1.3; }
 
-/* ===== MENU ===== */
+/* ===== MENU (Onda 5.3 do refactor: bg neutro, sem listra tricolor) =====
+   Identidade da tela vem do .menu-island-header (gradient na cor da ilha)
+   renderizado pelo menu.js, nao mais de um background amarelo/verde global
+   ou listra tricolor RS no topo. */
 #menu {
-    background: var(--screen-bg, linear-gradient(180deg, #FFF8E1 0%, #FFEB3B 45%, #A5D6A7 100%));
-    padding-top: 30px;
-    position: relative;
+    background: var(--screen-bg, var(--c-surface-app));
 }
 
-#menu::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 12px;
-    background: linear-gradient(90deg, #E53935 0%, #E53935 33%, #FFEB3B 33%, #FFEB3B 66%, #2E7D32 66%, #2E7D32 100%);
-    z-index: 50;
-    pointer-events: none;
-}
-
-#menu h2 {
-    font-size: 40px;
-    color: #B71C1C;
-    margin-bottom: 10px;
-    text-align: center;
-    text-shadow: 2px 2px 0 rgba(255,255,255,0.7);
-}
+/* Regra #menu h2 legacy removida nesta onda: estilizava #menuTitle
+   (hoje hidden via JS) e por especificidade (0,1,1) sobrescrevia
+   .menu-island-title (0,1,0), pintando o titulo da ilha de vermelho RS
+   sobre um header de gradient colorido — bug visual antigo. Sem essa
+   regra, .menu-island-title herda o color: #FFF do .menu-island-header
+   como originalmente projetado. */
 
 .stars-bar {
     font-size: 36px;
@@ -533,67 +421,10 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
     max-width: 800px;
 }
 
-/* ===== BADGES ===== */
-.badges-section {
-    width: 100%;
-    max-width: 800px;
-    margin-top: 24px;
-    padding: 0 10px;
-}
-
-.badges-section h3 {
-    font-size: 24px;
-    color: #B71C1C;
-    text-align: center;
-    margin-bottom: 12px;
-    text-shadow: 1px 1px 0 rgba(255,255,255,0.6);
-}
-
-.badges-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
-}
-
-.badge-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 80px;
-    text-align: center;
-}
-
-.badge-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    border: 3px solid #ddd;
-    background: white;
-    transition: all 0.3s;
-}
-
-.badge-icon.earned {
-    border-color: #FFD54F;
-    background: linear-gradient(135deg, #FFF9C4, #FFD54F);
-    animation: badgePop 0.5s ease;
-    box-shadow: 0 2px 8px rgba(255,193,7,0.4);
-}
-
-.badge-icon.locked {
-    filter: grayscale(1);
-    opacity: 0.4;
-}
-
-.badge-name {
-    font-size: 11px;
-    margin-top: 4px;
-    color: #777;
-}
+/* Sistema legacy de medalhas (.badges-section, .badges-grid, .badge-item,
+   .badge-icon, .badge-name) removido na Onda 8 (limpeza). Substituido pelo
+   sistema atual em design-system.css: .badges-grid-large + .badge-card +
+   tabs por raridade (Fase 6 Onda B). ~60 linhas eliminadas. */
 
 /* ===== STREAK ===== */
 .streak-display {
@@ -608,10 +439,16 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
 
 .streak-display.active { display: flex; }
 
-/* ===== ACTIVITY ===== */
+/* ===== ACTIVITY (Onda 5.7 do refactor) =====
+   padding-top reservava 80px para clearance do HUD fixed top-right
+   (rank+coin pills, ~50px) + btn-home fixed top-left (~50px) + buffer.
+   Reduzido para 64px (clearance real ~50px + 14px de respiro), liberando
+   16px de altura util para o conteudo da rodada.
+   Remocao completa do padding-top depende da Onda 6 (HUD migrado para
+   dentro do header in-flow, ja nao mais sobrescritos por position:fixed). */
 #activity {
-    padding-top: 80px;
-    gap: 20px;
+    padding-top: 64px;
+    gap: var(--s-4);
 }
 
 .activity-header { text-align: center; }
@@ -1004,59 +841,73 @@ body.theme-animated { animation: themeAnimatedPulse 4s ease-in-out infinite; }
 }
 
 /* ===== MASCOT ===== */
+/* Mascote (Onda 6 do refactor: 5 blocos consolidados em 3 - base + 2 overrides
+   semanticos). A base agora reflete a configuracao mais comum (4 telas com
+   main-nav: menu/badges/shop/parents); os antigos seletores duplicados foram
+   eliminados. Splash herda override para hero; islandMap mantem override
+   especial (lado esquerdo, evita conflito com CTA "Continuar" e HUD).
+   z-index: 90 preservado para nao alterar empilhamento com main-nav (50)
+   e btn-home (100). */
 #mascot {
     position: fixed;
-    bottom: 15px;
-    right: 60px;
-    width: 70px;
-    height: 70px;
+    bottom: 96px;       /* acima da main-nav (~70px) com folga */
+    right: 12px;
+    width: 100px;
+    height: 100px;
     z-index: 90;
     display: none;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
     transition: transform 0.3s;
 }
 
 #mascot.visible { display: block; }
-#mascot.idle { animation: float 3s ease-in-out infinite; }
+/* idle uniformizado em 3.5s (era 3s base + 3.5s nas 6 overrides; valor
+   efetivo em todas as telas ja era 3.5s, agora declarado uma vez so) */
+#mascot.idle { animation: float 3.5s ease-in-out infinite; }
 #mascot.happy { animation: bounce 0.6s ease; }
 #mascot.sad { animation: wobble 0.5s ease; }
 #mascot.celebrating { animation: bounce 0.6s ease infinite; }
-
-/* Fase 9 - Onda 1 + 13.5: posicoes do mascote por tela. Mascote MAIOR fora da
-   atividade pra crianca ver o cosmetico equipado (cor/acessorio). */
-body[data-screen="splash"] #mascot {
-    /* Posicionado no canto inferior direito sem cobrir botoes */
-    bottom: 16px;
-    right: 16px;
-    width: 110px; height: 110px;
-    z-index: 5;
-}
-body[data-screen="islandMap"] #mascot,
-body[data-screen="menu"] #mascot,
-body[data-screen="badges"] #mascot,
-body[data-screen="parents"] #mascot,
-body[data-screen="shop"] #mascot {
-    bottom: 96px; /* acima da main-nav */
-    right: 12px;
-    width: 100px; height: 100px;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
-}
-@media (max-width: 480px) {
-    body[data-screen="splash"] #mascot { width: 90px; height: 90px; }
-    body[data-screen="islandMap"] #mascot,
-    body[data-screen="menu"] #mascot,
-    body[data-screen="badges"] #mascot,
-    body[data-screen="parents"] #mascot,
-    body[data-screen="shop"] #mascot { width: 80px; height: 80px; }
-}
-/* Fase 13.5: bounce ao equipar novo cosmetico. */
+/* Fase 13.5: bounce ao equipar novo cosmetico (preservado) */
 #mascot.just-equipped { animation: bounce 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) !important; }
-body[data-screen="splash"] #mascot.idle,
-body[data-screen="islandMap"] #mascot.idle,
-body[data-screen="menu"] #mascot.idle,
-body[data-screen="badges"] #mascot.idle,
-body[data-screen="shop"] #mascot.idle,
-body[data-screen="parents"] #mascot.idle {
-    animation: float 3.5s ease-in-out infinite;
+
+/* Override SPLASH (hero): maior e mais embaixo (sem main-nav pra reservar) */
+body[data-screen="splash"] #mascot {
+    bottom: 16px;
+    width: 110px;
+    height: 110px;
+    z-index: 5;
+    filter: none;
+}
+
+/* Override ISLANDMAP: bottom-LEFT, evita conflito com a CTA "Continuar"
+   (canto direito da home-cta-bar) e com o HUD top-right. */
+body[data-screen="islandMap"] #mascot {
+    bottom: clamp(150px, 20vh, 200px);
+    left: 12px;
+    right: auto;
+    width: 78px;
+    height: 78px;
+}
+
+/* Mobile (≤480): tudo um pouco menor */
+@media (max-width: 480px) {
+    #mascot { width: 80px; height: 80px; }
+    body[data-screen="splash"] #mascot { width: 90px; height: 90px; }
+    body[data-screen="islandMap"] #mascot {
+        width: 64px;
+        height: 64px;
+        bottom: clamp(140px, 19vh, 175px);
+    }
+}
+
+/* Desktop (≥1024): islandMap com mais respiro */
+@media (min-width: 1024px) {
+    body[data-screen="islandMap"] #mascot {
+        bottom: clamp(160px, 18vh, 220px);
+        left: 24px;
+        width: 96px;
+        height: 96px;
+    }
 }
 
 /* ===== FEEDBACK ===== */
@@ -1085,33 +936,74 @@ body[data-screen="parents"] #mascot.idle {
 .feedback-box .emoji { font-size: 64px; margin-bottom: 10px; }
 .feedback-box .msg { font-size: 28px; font-weight: 700; margin-bottom: 20px; }
 
-/* ===== RESULT ===== */
-#result { justify-content: center; gap: 24px; }
-#result .result-emoji { font-size: 80px; }
-#result h2 { font-size: 40px; text-align: center; }
-#result .result-msg { font-size: 26px; text-align: center; color: #555; }
-.result-score { font-size: 34px; font-weight: 700; }
+/* ===== RESULT (Onda 5.8 do refactor: tokens canonicos, sem inline-styles) =====
+   Tela atua como .screen--hero conceitual: conteudo centralizado vertical,
+   acoes (botoes) no rodape via .result-actions (classe que substituiu o
+   style="display:flex;gap:14px;..." inline do #resultButtons). */
+#result { justify-content: center; gap: var(--s-5); }
+#result .result-emoji { font-size: clamp(56px, 14vw, 96px); }
+#result h2 { font-size: var(--t-display); text-align: center; color: var(--c-ink); margin: 0; }
+#result .result-msg { font-size: var(--t-body-l); text-align: center; color: var(--c-ink-soft); }
+.result-score { font-size: var(--t-h1); font-weight: 700; }
 
-/* ===== CELEBRATION ===== */
+/* Container de acoes do result (botoes "Voltar ao menu" / "Tentar novamente" /
+   "Ver premio!"). Substitui inline-style historico. */
+.result-actions {
+    display: flex;
+    gap: var(--s-3);
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== CELEBRATION (Onda 5.9 do refactor) =====
+   BG neutro - a celebracao visual vem das animacoes (confete, fogos,
+   arco-iris, h2 com float) injetadas via JS, nao mais de um gradient
+   RS bandeira gritante (vermelho/amarelo/verde) animado em loop. */
 #celebration {
     justify-content: center;
-    gap: 24px;
-    background: var(--screen-bg, linear-gradient(135deg, #E53935, #FFEB3B, #2E7D32));
-    background-size: 400% 400%;
-    animation: gradientBG 6s ease infinite;
+    gap: var(--s-5);
+    background: var(--screen-bg, var(--c-surface-app));
     position: relative;
     overflow: hidden;
 }
 
 #celebration h2 {
-    font-size: 46px;
-    color: white;
+    font-size: var(--t-display);
+    color: var(--c-ink);
     text-align: center;
-    text-shadow: 3px 3px 0 #B71C1C, -1px -1px 0 #2E7D32;
+    text-shadow: 0 2px 0 rgba(255, 213, 79, 0.55), 0 4px 12px rgba(0, 0, 0, 0.10);
     animation: float 2s ease-in-out infinite;
+    margin: 0;
 }
 
-#celebration .sub { font-size: 28px; text-align: center; color: #555; }
+#celebration .sub {
+    font-size: var(--t-body-l);
+    text-align: center;
+    color: var(--c-ink-soft);
+}
+
+/* CTA principal da celebracao: "Ganhe seu Premio!" (gera PDF do certificado).
+   Substitui inline style="background:linear-gradient(135deg,#E53935,#FFEB3B);
+   color:#3a2a00;font-size:32px;". Mantem feeling festivo via gradient
+   amarelo->ambar (paleta v3, sem RS bandeira). */
+.celeb-pdf-btn {
+    background: linear-gradient(135deg, #FFD54F 0%, #FFB300 60%, #FF8F00 100%);
+    color: var(--c-primary-ink);
+    font-size: clamp(22px, 4.5vw, 32px);
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 0 rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 18px rgba(255, 143, 0, 0.45);
+}
+.celeb-pdf-btn:hover {
+    filter: brightness(1.05);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(255, 143, 0, 0.55);
+}
+
+/* Botao "Voltar ao Menu" - substitui inline style="font-size:24px;" */
+.celeb-menu-btn { font-size: clamp(18px, 3.5vw, 24px); }
 
 .confetti {
     position: fixed;
@@ -1230,19 +1122,20 @@ body[data-screen="parents"] #mascot.idle {
     100% { transform: translate(var(--dx, 0), var(--dy, 0)) scale(1.1); opacity: 0; }
 }
 
-/* ===== SHOP ===== */
+/* ===== SHOP (Onda 5.4 do refactor: bg neutro, sem gradient amarelo) =====
+   padding-top: 80px preservado para reservar espaco do HUD fixed top-right
+   (rank+coin pills) — consolidacao do HUD vira na Onda 6. */
 #shop {
-    background: var(--screen-bg, linear-gradient(180deg, #FFF8E1 0%, #FFEB3B 100%));
+    background: var(--screen-bg, var(--c-surface-app));
     padding-top: 80px;
     gap: 16px;
 }
 
-#shop h2 {
-    font-size: 40px;
-    color: #B71C1C;
-    text-align: center;
-    text-shadow: 2px 2px 0 rgba(255,255,255,0.7);
-}
+/* Regra #shop h2 legacy removida nesta onda: estilizava #shopTitle
+   (hoje display:none inline) e por especificidade (0,1,1) sobrescrevia
+   .shop-screen-title (0,1,0), pintando o titulo da loja de vermelho RS
+   sobre fundo amarelo. Sem essa regra, .shop-screen-title aplica
+   suas regras como projetado: var(--fs-h2), color: var(--color-text). */
 
 .shop-banner {
     display: inline-flex;
@@ -1398,11 +1291,7 @@ body[data-screen="parents"] #mascot.idle {
     #splash h1 { font-size: 42px; }
     #splash .subtitle { font-size: 22px; }
     .splash-logo { width: 170px; height: 170px; }
-    .name-prompt-box { padding: 24px 18px; border-radius: 22px; }
-    .name-prompt-box h1 { font-size: 30px; }
-    .name-prompt-sub { font-size: 22px; }
-    .name-prompt-mate { width: 88px; height: 106px; }
-    #nameInput { font-size: 22px; padding: 14px 16px; }
+    /* Sub-rules .name-prompt-*/#nameInput removidas na Onda 8 (orfaos) */
     .btn { font-size: 22px; padding: 14px 28px; }
     #menu h2 { font-size: 30px; }
     .phase-card .phase-num { font-size: 28px; }
@@ -1424,10 +1313,11 @@ body[data-screen="parents"] #mascot.idle {
     .memory-card-back { font-size: 16px; }
     .odd-item { min-height: 100px; padding: 10px; }
     .odd-item svg { width: 60px; height: 60px; }
-    .badge-item { width: 65px; }
-    .badge-icon { width: 46px; height: 46px; font-size: 22px; }
-    .badge-name { font-size: 10px; }
-    #mascot { width: 55px; height: 55px; right: 50px; }
+    /* Sub-rules .badge-item/.badge-icon/.badge-name removidas na Onda 8 (orfaos). */
+    /* Regra #mascot { width: 55px; height: 55px; right: 50px; } removida na
+       Onda 8: era a antiga config 70->55px mobile do mascote pre-Fase 9; hoje
+       conflitava (source order) com a regra @media (max-width: 480px) #mascot
+       { width: 80px } da Onda 6, que ja estava sendo sobrescrita aqui. */
     #hud { font-size: 18px; padding: 8px 14px; }
     .shop-grid { grid-template-columns: repeat(2, 1fr); }
     .shop-card { min-height: 170px; }

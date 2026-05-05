@@ -14,8 +14,9 @@ async function startAtSplash(page) {
     await page.evaluate(() => {
         const KEY = 'thomas_learning_v3';
         const s = JSON.parse(localStorage.getItem(KEY) || '{}');
-        s.version = 5;
+        s.version = 6;
         s.hasSeenTutorial = true;
+        s.mascotType = 'dino';
         s.completedPhases = s.completedPhases || [];
         s.equipped = s.equipped || { theme: 'theme-default', mascot: 'mascot-default', accessory: 'acc-none', effect: 'effect-default' };
         localStorage.setItem(KEY, JSON.stringify(s));
@@ -41,17 +42,17 @@ test.describe('Navigation (Fase 10.4)', () => {
 
     test('Comecar leva ao islandMap com 5 hotspots', async ({ page }) => {
         await startAtIslandMap(page);
-        await expect(page.locator('.island-hotspot')).toHaveCount(5);
-        await expect(page.locator('.island-letters')).toBeVisible();
-        await expect(page.locator('.island-numbers')).toBeVisible();
-        await expect(page.locator('.island-colors')).toBeVisible();
-        await expect(page.locator('.island-syllables')).toBeVisible();
-        await expect(page.locator('.island-rewards')).toBeVisible();
+        await expect(page.locator('.island-card')).toHaveCount(5);
+        await expect(page.locator('.island-card[data-section="letters"]')).toBeVisible();
+        await expect(page.locator('.island-card[data-section="numbers"]')).toBeVisible();
+        await expect(page.locator('.island-card[data-section="colors"]')).toBeVisible();
+        await expect(page.locator('.island-card[data-section="syllables"]')).toBeVisible();
+        await expect(page.locator('.island-card[data-section="rewards"]')).toBeVisible();
     });
 
     test('islandMap tem logo + missoes diarias + main-nav', async ({ page }) => {
         await startAtIslandMap(page);
-        await expect(page.locator('.map-logo')).toBeVisible();
+        await expect(page.locator('.home-brand')).toBeVisible();
         await expect(page.locator('#missionsCard')).toBeVisible();
         await expect(page.locator('#mainNav')).toBeVisible();
         await expect(page.locator('#mainNav button[data-nav="play"]')).toBeVisible();
@@ -61,7 +62,7 @@ test.describe('Navigation (Fase 10.4)', () => {
 
     test('clicar na ilha das Letras abre o menu com cards', async ({ page }) => {
         await startAtIslandMap(page);
-        await page.click('.island-letters');
+        await page.click('.island-card[data-section="letters"]');
         await expect(page.locator('#menu')).toBeVisible();
         // Pelo menos 1 card visivel (a fase 1 que esta desbloqueada)
         await expect(page.locator('#menu .phase-card').first()).toBeVisible();
@@ -93,7 +94,7 @@ test.describe('Navigation (Fase 10.4)', () => {
 
     test('clicar fase 1 inicia atividade com powerup bar', async ({ page }) => {
         await startAtIslandMap(page);
-        await page.click('.island-letters');
+        await page.click('.island-card[data-section="letters"]');
         await page.locator('#menu .phase-card').first().click();
         await expect(page.locator('#activity')).toBeVisible();
         await expect(page.locator('#powerupBar')).toBeVisible();
@@ -101,7 +102,7 @@ test.describe('Navigation (Fase 10.4)', () => {
 
     test('homeBtn durante atividade volta ao islandMap', async ({ page }) => {
         await startAtIslandMap(page);
-        await page.click('.island-letters');
+        await page.click('.island-card[data-section="letters"]');
         await page.locator('#menu .phase-card').first().click();
         await expect(page.locator('#homeBtn')).toBeVisible();
         await page.click('#homeBtn');
@@ -110,7 +111,7 @@ test.describe('Navigation (Fase 10.4)', () => {
 
     test('mascote visivel durante atividade', async ({ page }) => {
         await startAtIslandMap(page);
-        await page.click('.island-letters');
+        await page.click('.island-card[data-section="letters"]');
         await page.locator('#menu .phase-card').first().click();
         await expect(page.locator('#mascot')).toHaveClass(/visible/);
     });

@@ -98,10 +98,11 @@ export function renderMissionsCard(state, onClaim) {
 
     card.appendChild(list);
 
-    // Insere o card antes do main-nav e depois do mapa.
-    const ambient = root.querySelector('.map-canvas');
-    if (ambient && ambient.nextSibling) {
-        root.insertBefore(card, ambient.nextSibling);
+    // Fase 15: insere no slot dedicado [data-slot="missions"] dentro do hero.
+    // Fallback: append direto no #islandMap (compat com layouts antigos).
+    const slot = root.querySelector('[data-slot="missions"]');
+    if (slot) {
+        slot.appendChild(card);
     } else {
         root.appendChild(card);
     }

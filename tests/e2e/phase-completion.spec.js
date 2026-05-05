@@ -6,8 +6,9 @@ async function startLetters(page) {
     await page.evaluate(() => {
         const KEY = 'thomas_learning_v3';
         const s = {
-            version: 5,
+            version: 6,
             hasSeenTutorial: true,
+            mascotType: 'dino',
             completedPhases: [],
             equipped: { theme: 'theme-default', mascot: 'mascot-default', accessory: 'acc-none', effect: 'effect-default' },
         };
@@ -16,7 +17,7 @@ async function startLetters(page) {
     await page.reload();
     await page.click('#startBtn');
     await expect(page.locator('#islandMap')).toBeVisible();
-    await page.click('.island-letters');
+    await page.click('.island-card[data-section="letters"]');
     await expect(page.locator('#menu')).toBeVisible();
 }
 

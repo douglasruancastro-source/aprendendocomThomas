@@ -115,7 +115,10 @@ export function showRankUpCelebration(rank) {
     soundBigReward();
 
     const overlay = document.createElement('div');
-    overlay.className = 'rankup-overlay';
+    // dual-class: .overlay base apenas. Evito .overlay--celebration porque
+    // ela aplica pointer-events: none (deixa confete passar) e o rankup tem
+    // backdrop dismissal/conteudo interativo.
+    overlay.className = 'rankup-overlay overlay';
     overlay.setAttribute('aria-live', 'polite');
 
     const card = document.createElement('div');
@@ -201,7 +204,7 @@ export function showIslandCompletionCelebration(island, bonusCoins) {
     soundBigReward();
 
     const overlay = document.createElement('div');
-    overlay.className = 'island-completion-overlay';
+    overlay.className = 'island-completion-overlay overlay overlay--island-complete';
     overlay.setAttribute('aria-live', 'polite');
 
     const card = document.createElement('div');
@@ -248,7 +251,7 @@ export function showIslandCompletionCelebration(island, bonusCoins) {
     }
 
     const closeBtn = document.createElement('button');
-    closeBtn.className = 'btn-primary island-completion-close';
+    closeBtn.className = 'btn-primary btn--primary island-completion-close';
     closeBtn.textContent = 'Continuar a aventura';
     closeBtn.onclick = () => overlay.remove();
     card.appendChild(closeBtn);

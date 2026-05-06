@@ -66,7 +66,11 @@ export function renderShop(state, onBack) {
 function renderCard(entry, state, refresh) {
     const { item, owned, equipped, locked, canAfford } = entry;
     const card = document.createElement('div');
-    card.className = 'shop-card';
+    // dual-class: classes canonicas .card + .card--interactive sao adicionadas
+    // SEM aplicar data-state — o legacy .shop-card.equipped/.locked ja resolve
+    // visualmente, e data-state="locked" canonico introduziria 🔒 ::after extra
+    // (redundante com o botao "Bloqueado") e cursor not-allowed.
+    card.className = 'shop-card card card--interactive';
     card.dataset.category = item.category; // Fase 7: drives preview animation
     if (equipped) card.classList.add('equipped');
     if (locked) card.classList.add('locked');

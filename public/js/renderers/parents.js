@@ -14,7 +14,7 @@ export function renderParents(state, onReset) {
 
     // Botao voltar (preserva estilo da tela)
     const backBtn = document.createElement('button');
-    backBtn.className = 'btn-back';
+    backBtn.className = 'btn-back btn--secondary';
     backBtn.id = 'parentsBackBtn';
     backBtn.textContent = '← Voltar';
     root.appendChild(backBtn);
@@ -48,7 +48,7 @@ function renderPinSetup(root, state) {
     card.appendChild(pinInput.wrapper);
 
     const confirmBtn = document.createElement('button');
-    confirmBtn.className = 'btn-primary';
+    confirmBtn.className = 'btn-primary btn--primary';
     confirmBtn.textContent = 'Confirmar PIN';
     confirmBtn.onclick = () => {
         const value = pinInput.getValue();
@@ -84,7 +84,7 @@ function renderPinGate(root, state, onReset) {
     card.appendChild(pinInput.wrapper);
 
     const enterBtn = document.createElement('button');
-    enterBtn.className = 'btn-primary';
+    enterBtn.className = 'btn-primary btn--primary';
     enterBtn.textContent = 'Entrar';
     enterBtn.onclick = () => {
         const value = pinInput.getValue();
@@ -99,7 +99,7 @@ function renderPinGate(root, state, onReset) {
 
     // "Esqueci o PIN" usa um codigo simples baseado no lastPlayDay.
     const forgot = document.createElement('button');
-    forgot.className = 'btn-secondary';
+    forgot.className = 'btn-secondary btn--secondary';
     forgot.style.marginTop = '12px';
     forgot.textContent = 'Esqueci o PIN';
     forgot.onclick = () => {
@@ -226,7 +226,7 @@ function renderDashboard(root, state, onReset) {
     backupBtns.className = 'parents-backup-btns';
 
     const exportBtn = document.createElement('button');
-    exportBtn.className = 'btn-secondary';
+    exportBtn.className = 'btn-secondary btn--secondary';
     exportBtn.textContent = '\u{2B07}\u{FE0F} Exportar progresso';
     exportBtn.onclick = () => {
         const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
@@ -240,7 +240,7 @@ function renderDashboard(root, state, onReset) {
     backupBtns.appendChild(exportBtn);
 
     const importBtn = document.createElement('button');
-    importBtn.className = 'btn-secondary';
+    importBtn.className = 'btn-secondary btn--secondary';
     importBtn.textContent = '\u{2B06}\u{FE0F} Importar progresso';
     importBtn.onclick = () => {
         const input = document.createElement('input');

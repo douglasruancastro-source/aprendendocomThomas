@@ -42,7 +42,13 @@ export function renderBadges(state) {
         renderItem: (b) => {
             const earned = state.badges.includes(b.id);
             const item = document.createElement('div');
-            item.className = `badge-card rarity-${b.rarity || 'common'} ` + (earned ? 'earned' : 'locked');
+            const rarity = b.rarity || 'common';
+            // dual-class: sistema canonico .card + .card--rarity-* aplicado apenas
+            // em earned para preservar o visual legacy de locked (sem 🔒 duplicado
+            // pelo .card[data-state="locked"]::after, sem pulse colorido, sem
+            // cursor not-allowed extra).
+            const canonical = earned ? `card card--rarity-${rarity} ` : '';
+            item.className = `badge-card ${canonical}rarity-${rarity} ` + (earned ? 'earned' : 'locked');
             item.setAttribute('data-state', earned ? 'earned' : 'locked');
             item.setAttribute('data-rarity', b.rarity || 'common');
 

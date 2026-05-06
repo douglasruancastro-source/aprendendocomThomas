@@ -25,14 +25,6 @@ function getPlayerName() {
     return state.playerName && state.playerName.trim() ? state.playerName : DEFAULT_NAME;
 }
 
-function applyPlayerNameToUI() {
-    const name = getPlayerName();
-    const menuTitle = document.getElementById('menuTitle');
-    if (menuTitle) menuTitle.textContent = `Ola, ${name}! Escolha uma fase!`;
-    const shopTitle = document.getElementById('shopTitle');
-    if (shopTitle) shopTitle.textContent = `Loja do ${name}`;
-}
-
 // ===== Navegacao entre telas =====
 const NAV_VISIBLE_SCREENS = new Set(['islandMap', 'menu', 'shop', 'badges', 'parents']);
 const HOME_BTN_HIDDEN_SCREENS = new Set(['splash', 'menu', 'islandMap', 'shop', 'badges', 'parents']);
@@ -70,7 +62,6 @@ function showScreen(id) {
 }
 
 function showMenu(filter = 'all') {
-    applyPlayerNameToUI();
     showScreen('menu');
     renderMenu(
         state,
@@ -82,7 +73,6 @@ function showMenu(filter = 'all') {
 }
 
 function showIslandMap() {
-    applyPlayerNameToUI();
     showScreen('islandMap');
     renderIslandMap({
         state,
@@ -132,7 +122,6 @@ function showIslandMap() {
 }
 
 function showShop() {
-    applyPlayerNameToUI();
     showScreen('shop');
     renderShop(state, showIslandMap);
 }
@@ -164,7 +153,6 @@ function showCelebrationScreen(phase) {
 }
 
 function showSplash() {
-    applyPlayerNameToUI();
     showScreen('splash');
 }
 
@@ -269,7 +257,6 @@ function boot() {
         renderHud(state);
     }
 
-    applyPlayerNameToUI();
     showSplash();
 }
 

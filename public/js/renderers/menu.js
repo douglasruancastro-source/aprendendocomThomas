@@ -41,16 +41,9 @@ export function renderMenu(state, onStartPhase, _onOpenShop, filter = 'all', onS
     if (filter && filter !== 'all') menuRoot.classList.add(`filter-${filter}`);
     menuRoot.dataset.island = filter || 'all';
 
-    // Limpar containers antigos (mantem botao voltar)
+    // Limpar host criado em renderizacao anterior (mantem botao voltar)
     const oldHost = document.getElementById('menuPagerHost');
     if (oldHost) oldHost.remove();
-
-    // Esconder grids antigos (legacy estrutura)
-    ['phasesGrid', 'phasesGridLogic', 'phasesGridMath', 'phasesGridSyllables'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) { el.innerHTML = ''; el.style.display = 'none'; }
-    });
-    document.querySelectorAll('#menu .section-label').forEach((el) => { el.style.display = 'none'; });
 
     // Header da ilha (hero) + estrelas
     const islandId = SECTION_TO_ISLAND[filter];
@@ -110,12 +103,6 @@ export function renderMenu(state, onStartPhase, _onOpenShop, filter = 'all', onS
     }
 
     host.appendChild(header);
-
-    // Atualiza titulo legacy (caso seja referenciado)
-    const menuTitle = document.getElementById('menuTitle');
-    if (menuTitle) menuTitle.style.display = 'none';
-    const starsBar = document.getElementById('starsBar');
-    if (starsBar) starsBar.style.display = 'none';
 
     Pager({
         items: filtered,

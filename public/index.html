@@ -31,7 +31,7 @@
 </div>
 
 <!-- SPLASH SCREEN (Fase 15: 2 colunas em tablet+, CTA forte unica) -->
-<div id="splash" class="screen">
+<div id="splash" class="screen screen--hero">
     <div class="splash-stage">
         <div class="splash-copy">
             <img src="assets/brand/logo-mundo-tres-ilhas.jpg" alt="Mundo das Tres Ilhas" class="splash-brand">
@@ -51,7 +51,7 @@
 </div>
 
 <!-- MASCOT PICK SCREEN (Fase 14: primeira escolha do mascote) -->
-<div id="mascotPick" class="screen">
+<div id="mascotPick" class="screen screen--hero">
     <h2 class="mascot-pick-title">Quem voce quer ser?</h2>
     <p class="mascot-pick-sub">Escolha seu amigo aventureiro!</p>
     <div class="mascot-pick-grid">
@@ -69,7 +69,7 @@
 </div>
 
 <!-- ISLAND MAP SCREEN (home redesenhada — Fase 15) -->
-<div id="islandMap" class="screen">
+<div id="islandMap" class="screen screen--app">
     <!-- Zona A: top strip (brand + progresso global) -->
     <header class="home-strip" aria-label="Resumo do progresso">
         <div class="home-brand">
@@ -183,30 +183,20 @@
 </div>
 
 <!-- MENU SCREEN -->
-<div id="menu" class="screen">
-    <button class="btn-back" id="menuBackBtn">&larr; Voltar</button>
-    <h2 id="menuTitle">Escolha uma fase!</h2>
-    <div class="stars-bar" id="starsBar"></div>
-    <div class="section-label" data-section="alfa">Alfabetizacao</div>
-    <div class="phases-grid" id="phasesGrid"></div>
-    <div class="section-label" data-section="logic">Raciocinio Logico</div>
-    <div class="phases-grid" id="phasesGridLogic"></div>
-    <div class="section-label" data-section="math">Matematica</div>
-    <div class="phases-grid" id="phasesGridMath"></div>
-    <div class="section-label" data-section="syllables">Sons &amp; Silabas</div>
-    <div class="phases-grid" id="phasesGridSyllables"></div>
+<div id="menu" class="screen screen--app">
+    <button class="btn-back btn--secondary" id="menuBackBtn">&larr; Voltar</button>
 </div>
 
 <!-- BADGES SCREEN -->
-<div id="badges" class="screen">
-    <button class="btn-back" id="badgesBackBtn">&larr; Voltar</button>
+<div id="badges" class="screen screen--app">
+    <button class="btn-back btn--secondary" id="badgesBackBtn">&larr; Voltar</button>
     <h2 class="screen-title">Minhas Medalhas</h2>
     <div class="badges-grid-large" id="badgesGridLarge"></div>
 </div>
 
 <!-- PARENTS SCREEN -->
-<div id="parents" class="screen">
-    <button class="btn-back" id="parentsBackBtn">&larr; Voltar</button>
+<div id="parents" class="screen screen--app">
+    <button class="btn-back btn--secondary" id="parentsBackBtn">&larr; Voltar</button>
     <h2 class="screen-title">Area dos pais</h2>
     <div class="parents-card">
         <div class="parents-emoji" aria-hidden="true">&#x1F512;</div>
@@ -216,7 +206,7 @@
 </div>
 
 <!-- ACTIVITY SCREEN -->
-<div id="activity" class="screen">
+<div id="activity" class="screen screen--game">
     <div class="activity-header">
         <h2 id="activityTitle"></h2>
         <div class="round-info" id="roundInfo"></div>
@@ -249,14 +239,13 @@
 </div>
 
 <!-- SHOP SCREEN -->
-<div id="shop" class="screen">
-    <h2 id="shopTitle" style="display:none;">Loja</h2>
+<div id="shop" class="screen screen--app">
     <div id="shopContent"></div>
-    <button class="btn-secondary" id="shopBackBtn">← Voltar</button>
+    <button class="btn-secondary btn--secondary" id="shopBackBtn">← Voltar</button>
 </div>
 
 <!-- RESULT SCREEN -->
-<div id="result" class="screen">
+<div id="result" class="screen screen--hero">
     <div class="result-emoji" id="resultEmoji"></div>
     <h2 id="resultTitle"></h2>
     <div class="result-msg" id="resultMsg"></div>
@@ -265,15 +254,15 @@
 </div>
 
 <!-- CELEBRATION SCREEN -->
-<div id="celebration" class="screen">
+<div id="celebration" class="screen screen--hero">
     <h2 id="celebTitle"></h2>
     <div class="sub" id="celebSub"></div>
     <button class="btn celeb-pdf-btn" id="celebPdfBtn">Ganhe seu Premio!</button>
-    <button class="btn btn-primary celeb-menu-btn" id="celebMenuBtn">Voltar ao Menu</button>
+    <button class="btn btn-primary btn--primary celeb-menu-btn" id="celebMenuBtn">Voltar ao Menu</button>
 </div>
 
 <!-- FEEDBACK OVERLAY -->
-<div class="feedback-overlay" id="feedbackOverlay">
+<div class="feedback-overlay overlay overlay--feedback" id="feedbackOverlay">
     <div class="feedback-box">
         <div class="emoji" id="fbEmoji"></div>
         <div class="msg" id="fbMsg"></div>

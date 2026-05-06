@@ -4,7 +4,7 @@
 export function LevelCard({ phase, isCompleted, isUnlocked, onClick, stars = 0, frame = null }) {
     const card = document.createElement('div');
     const state = isCompleted ? 'completed' : (isUnlocked ? 'available' : 'locked');
-    card.className = 'phase-card' + (isUnlocked ? '' : ' locked');
+    card.className = 'phase-card card card--interactive' + (isUnlocked ? '' : ' locked');
     card.setAttribute('data-state', state);
     card.setAttribute('data-phase-id', String(phase.id));
     // Fase 9 - Onda 3.2: aplica moldura equipada nas fases completas.

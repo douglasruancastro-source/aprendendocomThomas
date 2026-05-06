@@ -571,37 +571,11 @@
 .ambient-particle.treasure-glow.t1 { top: 64%; left: 70%; animation-delay: 0s; }
 .ambient-particle.treasure-glow.t2 { top: 84%; left: 88%; animation-delay: 1.2s; }
 
-/* ============================================================
-   Filtro do menu (cross-screen) — inalterado
-   ============================================================ */
-#menu.filter-letters .section-label[data-section="math"],
-#menu.filter-letters #phasesGridMath {
-    display: none;
-}
-#menu.filter-numbers .section-label[data-section="alfa"],
-#menu.filter-numbers .section-label[data-section="logic"],
-#menu.filter-numbers #phasesGrid,
-#menu.filter-numbers #phasesGridLogic {
-    display: none;
-}
-#menu.filter-colors .section-label[data-section="alfa"],
-#menu.filter-colors .section-label[data-section="logic"],
-#menu.filter-colors .section-label[data-section="math"],
-#menu.filter-colors #phasesGrid,
-#menu.filter-colors #phasesGridLogic {
-    display: none;
-}
-#menu.filter-colors #phasesGridMath .phase-card[data-phase-id]:not([data-phase-id="13"]) {
-    display: none;
-}
-#menu.filter-syllables .section-label[data-section="alfa"],
-#menu.filter-syllables .section-label[data-section="logic"],
-#menu.filter-syllables .section-label[data-section="math"],
-#menu.filter-syllables #phasesGrid,
-#menu.filter-syllables #phasesGridLogic,
-#menu.filter-syllables #phasesGridMath {
-    display: none;
-}
+/* Bloco "Filtro do menu (cross-screen)" removido na Fase 19: selecionava
+   .section-label[data-section="..."] e #phasesGrid* — todos os alvos foram
+   eliminados na Fase 18 quando o HTML estatico do #menu foi enxugado.
+   Filtragem por ilha e ordering hoje vivem em menu.js (SECTION_TO_ISLAND
+   + ranges de phase) e o renderer cria estrutura dinamica em .menu-host. */
 
 /* ============================================================
    Reduced motion

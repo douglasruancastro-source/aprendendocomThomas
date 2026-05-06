@@ -1781,8 +1781,8 @@ body.has-main-nav .screen.active {
     z-index: 3;
 }
 
-/* ===== Shop polish (legacy classes) ===== */
-.shop-section-emoji { font-size: 1.2em; margin-right: 4px; }
+/* ===== Shop polish ===== */
+/* .shop-section-emoji removido na Fase 20 (orfao). */
 .shop-card-seal {
     position: absolute;
     top: 8px;

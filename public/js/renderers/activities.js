@@ -31,7 +31,7 @@ export function renderFindLetters(ctx, round) {
         grid.appendChild(bubble);
     });
     const checkBtn = document.createElement('button');
-    checkBtn.className = 'btn btn-primary';
+    checkBtn.className = 'btn btn-primary btn--primary';
     checkBtn.textContent = 'Conferir!';
     checkBtn.onclick = async () => {
         const correctSet = new Set(round.correct);

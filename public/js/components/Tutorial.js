@@ -12,7 +12,7 @@ export function startTutorial({ steps, onDone }) {
     }
     let idx = 0;
     const overlay = document.createElement('div');
-    overlay.className = 'tutorial-overlay';
+    overlay.className = 'tutorial-overlay overlay overlay--tutorial';
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-label', 'Tutorial');
 
@@ -35,13 +35,13 @@ export function startTutorial({ steps, onDone }) {
     actions.className = 'tutorial-actions';
 
     const skipBtn = document.createElement('button');
-    skipBtn.className = 'tutorial-skip btn-secondary';
+    skipBtn.className = 'tutorial-skip btn-secondary btn--secondary';
     skipBtn.textContent = 'Pular';
     skipBtn.type = 'button';
     actions.appendChild(skipBtn);
 
     const nextBtn = document.createElement('button');
-    nextBtn.className = 'tutorial-next btn-primary';
+    nextBtn.className = 'tutorial-next btn-primary btn--primary';
     nextBtn.type = 'button';
     actions.appendChild(nextBtn);
 

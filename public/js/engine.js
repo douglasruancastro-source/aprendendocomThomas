@@ -7,7 +7,7 @@ import { ACTIVITY_RENDERERS } from './renderers/activities.js';
 import { showFeedback } from './renderers/feedback.js';
 import { setMascot } from './renderers/mascot.js';
 import { animateCoinGain, renderHud } from './renderers/menu.js';
-import { celebrate, spawnConfetti } from './renderers/celebration.js';
+import { celebrate } from './renderers/celebration.js';
 import { saveState } from './state.js';
 import { soundComplete, soundBigReward, soundBadge, soundStreak } from './audio.js';
 import { checkBadges, rewardForAnswer, rewardForPhaseEnd, BADGE_DEFS } from './rewards.js';
@@ -384,7 +384,7 @@ function showResult() {
             saveState(state);
             renderHud(state);
             const menuBtn = document.createElement('button');
-            menuBtn.className = 'btn btn-primary';
+            menuBtn.className = 'btn btn-primary btn--primary';
             menuBtn.textContent = 'Voltar ao Menu';
             menuBtn.onclick = () => session.onShowMenu();
             btns.appendChild(menuBtn);
@@ -469,7 +469,7 @@ function showResult() {
     }
 
     const menuBtn = document.createElement('button');
-    menuBtn.className = 'btn btn-primary';
+    menuBtn.className = 'btn btn-primary btn--primary';
     menuBtn.textContent = 'Voltar ao Menu';
     menuBtn.onclick = () => session.onShowMenu();
     btns.appendChild(menuBtn);
